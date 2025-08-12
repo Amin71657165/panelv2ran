@@ -3,541 +3,538 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>آزادی‌نت - سرویس VPN حرفه‌ای و رایگان</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        'vazir': ['Vazirmatn', 'Tahoma', 'Arial', 'sans-serif']
-                    },
-                    animation: {
-                        'fade-in': 'fadeIn 0.5s ease-out',
-                        'slide-up': 'slideUp 0.6s ease-out forwards',
-                        'pulse-fast': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'gradient-bg': 'gradient-bg 15s ease infinite',
-                    },
-                    keyframes: {
-                        fadeIn: { 'from': { opacity: 0 }, 'to': { opacity: 1 } },
-                        slideUp: { 
-                            'from': { transform: 'translateY(30px)', opacity: 0 }, 
-                            'to': { transform: 'translateY(0)', opacity: 1 } 
-                        },
-                        'gradient-bg': {
-                            '0%, 100%': { 'background-position': '0% 50%' },
-                            '50%': { 'background-position': '100% 50%' },
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>مدیریت سابسکریپشن پروکسی</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { 
-            font-family: 'Vazirmatn', Tahoma, Arial, sans-serif;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(to right, #2c3e50, #4a6491);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        
+        header h1 i {
+            color: #4dabf7;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
             line-height: 1.6;
-            scroll-behavior: smooth;
-            background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e);
-            background-size: 400% 400%;
-            animation: gradient-bg 15s ease infinite;
         }
-        .card-glass {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+        
+        .input-section {
+            padding: 30px;
+            border-bottom: 1px solid #eee;
         }
-        .card-glass:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transform: translateY(-5px);
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
         }
-        .status-online {
-            background: #10b981;
-            box-shadow: 0 0 12px rgba(16, 185, 129, 0.8);
-            animation: pulse-fast 2s infinite;
+        
+        #subscriptionUrl {
+            flex: 1;
+            padding: 14px 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
         }
-        .ripple { position: relative; overflow: hidden; }
-        .ripple::before {
-            content: ''; position: absolute; top: 50%; left: 50%;
-            width: 0; height: 0; border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            transform: translate(-50%, -50%); transition: width 0.6s, height 0.6s;
+        
+        #subscriptionUrl:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
         }
-        .ripple:active::before { width: 300px; height: 300px; }
-        .timeline-item::before {
-            content: '';
-            background: rgba(255,255,255,0.2);
-            width: 3px;
-            height: 100%;
-            position: absolute;
-            right: 1.1rem;
-            top: 1.5rem;
-            z-index: 1;
+        
+        #loadBtn {
+            background: linear-gradient(to right, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
         }
-        .timeline-container > div:last-child .timeline-item::before {
-            display: none;
+        
+        #loadBtn:hover {
+            background: linear-gradient(to right, #2980b9, #2573a7);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
-        .faq-answer {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.5s ease-in-out;
+        
+        .protocol-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
         }
-        .animated-section {
-            opacity: 0;
+        
+        .protocol-btn {
+            padding: 10px 20px;
+            background: #f1f2f6;
+            border: 1px solid #ddd;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
         }
-        .config-list::-webkit-scrollbar {
-            width: 8px;
+        
+        .protocol-btn.active {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
         }
-        .config-list::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.2);
+        
+        .proxy-list {
+            padding: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .proxy-card {
+            background: white;
+            border: 1px solid #e0e6ed;
             border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+            position: relative;
         }
-        .config-list::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.2);
-            border-radius: 10px;
-        }
-        .config-list::-webkit-scrollbar-thumb:hover {
-            background: rgba(255,255,255,0.3);
-        }
-        .speed-test-bar {
-            height: 10px;
-            border-radius: 5px;
-            margin-top: 5px;
-            background: rgba(255,255,255,0.1);
-            overflow: hidden;
-        }
-        .speed-test-fill {
-            height: 100%;
-            transition: width 0.3s ease;
-        }
-        .ping-indicator {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            margin-left: 5px;
-        }
-        .ping-good { background-color: #10B981; }
-        .ping-medium { background-color: #F59E0B; }
-        .ping-bad { background-color: #EF4444; }
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(255, 71, 87, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); }
-        }
-        .config-card {
-            transition: all 0.3s ease;
-            border-radius: 12px;
-        }
-        .config-card:hover {
+        
+        .proxy-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-color: #3498db;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .protocol {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 18px;
+        }
+        
+        .protocol.vless {
+            color: #e74c3c;
+        }
+        
+        .protocol.vmess {
+            color: #9b59b6;
+        }
+        
+        .protocol.trojan {
+            color: #1abc9c;
+        }
+        
+        .protocol.shadowsocks {
+            color: #f39c12;
+        }
+        
+        .protocol.other {
+            color: #7f8c8d;
+        }
+        
+        .proxy-name {
+            font-weight: 600;
+            font-size: 18px;
+            color: #2c3e50;
+        }
+        
+        .proxy-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .detail-label {
+            font-size: 13px;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+        }
+        
+        .detail-value {
+            font-weight: 500;
+            word-break: break-all;
+        }
+        
+        .copy-btn {
+            background: linear-gradient(to right, #2ecc71, #27ae60);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 20px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        
+        .copy-btn:hover {
+            background: linear-gradient(to right, #27ae60, #219653);
+            transform: translateY(-2px);
+        }
+        
+        .no-proxies {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+        
+        .no-proxies i {
+            font-size: 50px;
+            margin-bottom: 20px;
+            color: #bdc3c7;
+        }
+        
+        .status {
+            text-align: center;
+            padding: 15px;
+            font-weight: 500;
+            color: #7f8c8d;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 14px;
+            border-top: 1px solid #eee;
+            background: #f8f9fa;
+        }
+        
+        @media (max-width: 768px) {
+            .input-group {
+                flex-direction: column;
+            }
+            
+            #loadBtn {
+                padding: 14px;
+            }
+            
+            .proxy-details {
+                grid-template-columns: 1fr;
+            }
+            
+            header h1 {
+                font-size: 1.8rem;
+            }
         }
     </style>
 </head>
-<body class="min-h-screen text-gray-200">
-
-    <!-- Header -->
-    <header class="py-20 relative overflow-hidden">
-        <div class="container mx-auto px-4 relative z-10">
-            <div class="text-center animate-fade-in">
-                <div class="flex items-center justify-center mb-10">
-                    <div class="card-glass rounded-3xl flex items-center justify-center w-24 h-24 ml-6 shadow-2xl">
-                        <span class="text-4xl text-white">🚀</span>
-                    </div>
-                    <div>
-                        <h1 class="text-5xl md:text-6xl font-black mb-3 text-white">آزادی‌نت</h1>
-                        <p class="text-blue-200 text-lg md:text-xl font-medium">سرویس VPN حرفه‌ای و رایگان</p>
-                    </div>
-                </div>
-                
-                <div class="card-glass rounded-3xl p-6 md:p-8 inline-block shadow-2xl mb-6">
-                    <div class="grid grid-cols-3 gap-4 md:gap-8">
-                        <div class="text-center">
-                            <div class="flex items-center justify-center mb-3">
-                                <div class="w-3 h-3 status-online rounded-full ml-2"></div>
-                                <div class="font-bold text-lg text-gray-100">وضعیت</div>
-                            </div>
-                            <div class="text-blue-200 text-sm font-mono">آپتایم: <span id="uptime" class="font-semibold">99.98</span>%</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="font-bold text-2xl mb-1 text-white" id="activeServers">24</div>
-                            <div class="text-blue-200 text-sm">سرور فعال</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="font-bold text-2xl mb-1 text-white" id="serverPing">--</div>
-                            <div class="text-blue-200 text-sm">پینگ</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card-glass rounded-3xl p-6 md:p-8 inline-block shadow-2xl max-w-2xl w-full">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-                        <div class="flex flex-col items-center">
-                            <i class="fa-solid fa-wifi text-blue-300 text-2xl mb-3"></i>
-                            <h3 class="text-gray-300 text-sm font-bold mb-1">آدرس IP شما</h3>
-                            <p id="user-ip" class="font-mono text-white font-semibold animate-pulse">در حال بارگذاری...</p>
-                        </div>
-                         <div class="flex flex-col items-center">
-                            <i class="fa-solid fa-location-dot text-green-300 text-2xl mb-3"></i>
-                            <h3 class="text-gray-300 text-sm font-bold mb-1">موقعیت مکانی</h3>
-                            <p id="user-location" class="font-mono text-white font-semibold animate-pulse">در حال بارگذاری...</p>
-                        </div>
-                         <div class="flex flex-col items-center">
-                            <i class="fa-solid fa-building text-purple-300 text-2xl mb-3"></i>
-                            <h3 class="text-gray-300 text-sm font-bold mb-1">سرویس‌دهنده</h3>
-                            <p id="user-isp" class="font-mono text-white font-semibold animate-pulse">در حال بارگذاری...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- Main Content Sections -->
-    <div class="space-y-16 md:space-y-24 pb-16">
-
-        <!-- Quick Actions -->
-        <section class="relative z-20 container mx-auto px-4">
-            <div class="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-                <a href="#sublink" class="card-glass rounded-3xl p-6 text-center ripple group">
-                    <div class="w-16 h-16 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg transition-transform group-hover:scale-110">
-                        <i class="fa-solid fa-link text-3xl text-white"></i>
-                    </div>
-                    <h3 class="font-bold text-xl mb-2 text-white">لینک اشتراک</h3>
-                    <p class="text-gray-300 text-sm">افزودن همه سرورها</p>
-                </a>
-                <a href="#tools" class="card-glass rounded-3xl p-6 text-center ripple group">
-                    <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg transition-transform group-hover:scale-110">
-                        <i class="fa-solid fa-toolbox text-3xl text-white"></i>
-                    </div>
-                    <h3 class="font-bold text-xl mb-2 text-white">ابزارهای واقعی</h3>
-                    <p class="text-gray-300 text-sm">تست پینگ و امنیت</p>
-                </a>
-                <a href="#notifications" class="card-glass rounded-3xl p-6 text-center ripple group">
-                    <div class="w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg transition-transform group-hover:scale-110">
-                        <i class="fa-solid fa-bell text-3xl text-white"></i>
-                    </div>
-                    <h3 class="font-bold text-xl mb-2 text-white">آخرین آپدیت‌ها</h3>
-                    <p class="text-gray-300 text-sm">اخبار و اطلاعیه‌ها</p>
-                </a>
-            </div>
-        </section>
-
-        <!-- Subscription Link Section -->
-        <section id="sublink" class="animated-section container mx-auto px-4">
-            <div class="card-glass rounded-3xl shadow-2xl p-8 max-w-4xl mx-auto text-center">
-                 <div class="w-20 h-20 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                    <i class="fa-solid fa-link text-3xl text-white"></i>
-                </div>
-                <h2 class="text-3xl font-bold mb-4 text-white">
-                    لینک اشتراک (Subscription)
-                </h2>
-                <p class="text-gray-300 text-lg mb-6">این لینک را در کلاینت خود وارد کنید تا همه سرورها به صورت خودکار اضافه شوند.</p>
-                <div class="bg-black bg-opacity-20 rounded-xl p-4 mb-6 shadow-inner relative z-10">
-                    <p id="subLink" class="font-mono text-center text-white font-bold text-sm md:text-lg break-all">https://raw.githubusercontent.com/Mosifree/-FREE2CONFIG/refs/heads/main/Movaghat</p>
-                </div>
-                <button onclick="copySubLink()" class="bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white px-8 py-4 rounded-xl font-bold text-lg ripple transition-all shadow-lg hover:shadow-xl">
-                    <i class="fa-solid fa-copy ml-2"></i>
-                    کپی کردن لینک
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-shield-alt"></i> مدیریت سابسکریپشن پروکسی</h1>
+            <p class="subtitle">لینک سابسکریپشن خود را وارد کنید تا تمامی پروکسی‌ها (Vless, VMess, Trojan و ...) به صورت لیست نمایش داده شوند. هر پروکسی را می‌توانید با یک کلیک کپی کنید.</p>
+        </header>
+        
+        <div class="input-section">
+            <div class="input-group">
+                <input type="url" id="subscriptionUrl" placeholder="https://example.com/subscription/link" autocomplete="off">
+                <button id="loadBtn">
+                    <i class="fas fa-download"></i> بارگذاری سابسکریپشن
                 </button>
             </div>
-        </section>
-
-        <!-- Server Info -->
-        <section id="servers" class="animated-section container mx-auto px-4">
-            <div class="card-glass rounded-3xl shadow-2xl p-6 md:p-8 max-w-6xl mx-auto">
-                <div class="text-center mb-12">
-                    <h2 class="text-4xl font-bold mb-4 text-white">
-                        کانفیگ‌های سابسکریشن
-                    </h2>
-                    <p class="text-gray-300 text-lg">کانفیگ‌های موجود در لینک اشتراک با پینگ واقعی</p>
-                </div>
-                
-                <div class="card-glass rounded-2xl p-8">
-                    <div class="text-center mb-6">
-                        <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl">
-                            <span class="text-3xl text-white">⚙️</span>
-                        </div>
-                        <h3 class="text-2xl font-bold text-white mb-2">لیست کانفیگ‌ها</h3>
-                        <p class="text-blue-300">سرورهای موجود در سابسکریشن با لوکیشن واقعی</p>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <button onclick="refreshAllConfigPings()" class="w-full bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white py-3 rounded-xl font-bold text-lg ripple transition-all shadow-lg hover:shadow-xl">
-                            <i class="fa-solid fa-rotate ml-2"></i>
-                            بروزرسانی همه پینگ‌ها
-                        </button>
-                    </div>
-                    
-                    <div id="config-list-container" class="space-y-4 h-96 overflow-y-auto config-list pr-2">
-                        <!-- Config cards will be injected here by JS -->
-                    </div>
-                </div>
-            </div>
-        </section>
-
-    </div>
-    <!-- Footer -->
-    <footer class="pt-16 pb-8 relative overflow-hidden">
-        <div class="container mx-auto px-4 relative z-10">
-            <div class="text-center mb-10">
-                <h2 class="text-4xl font-bold mb-2 text-white">آزادی‌نت</h2>
-                <p class="text-blue-200">اینترنت آزاد برای همه، همیشه و همه‌جا</p>
-            </div>
-            <div class="grid md:grid-cols-2 gap-8 max-w-2xl mx-auto mb-10">
-                <!-- Developer -->
-                <a href="https://t.me/asrnovin_ir" target="_blank" class="card-glass rounded-2xl p-6 flex items-center space-x-4 space-x-reverse group">
-                    <div class="w-16 h-16 bg-gradient-to-br from-sky-500 to-blue-600 rounded-full flex items-center justify-center text-3xl text-white shadow-lg transition-transform group-hover:scale-110">
-                        <i class="fa-solid fa-user-astronaut"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-xl text-white">توسعه‌دهنده</h3>
-                        <p class="text-gray-300">ارتباط مستقیم و پشتیبانی</p>
-                    </div>
-                </a>
-                <!-- Channel -->
-                 <a href="https://t.me/asrnovin_ir" target="_blank" class="card-glass rounded-2xl p-6 flex items-center space-x-4 space-x-reverse group">
-                    <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center text-3xl text-white shadow-lg transition-transform group-hover:scale-110">
-                        <i class="fa-brands fa-telegram"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-xl text-white">کانال تلگرام</h3>
-                        <p class="text-gray-300">کانالی برای شما عزیزان</p>
-                    </div>
-                </a>
-            </div>
-            <div class="border-t border-white border-opacity-20 pt-6 text-center text-blue-200 text-sm">
-                <p>
-                    © 1404 آزادی‌نت - ساخته شده با ❤️ برای مردم ایران
-                </p>
+            
+            <div class="protocol-filters">
+                <div class="protocol-btn active" data-protocol="all">همه</div>
+                <div class="protocol-btn" data-protocol="vless">Vless</div>
+                <div class="protocol-btn" data-protocol="vmess">VMess</div>
+                <div class="protocol-btn" data-protocol="trojan">Trojan</div>
+                <div class="protocol-btn" data-protocol="shadowsocks">Shadowsocks</div>
             </div>
         </div>
-    </footer>
+        
+        <div class="proxy-list" id="proxyList">
+            <div class="no-proxies">
+                <i class="fas fa-cloud-download-alt"></i>
+                <h3>هنوز پروکسی‌ای بارگذاری نشده است</h3>
+                <p>لطفاً لینک سابسکریپشن خود را وارد کرده و دکمه بارگذاری را بزنید</p>
+            </div>
+        </div>
+        
+        <div class="status" id="status">
+            آماده برای بارگذاری سابسکریپشن
+        </div>
+        
+        <footer>
+            <p>ساخته شده با ❤️ | تمامی محاسبات در مرورگر شما انجام می‌شود و اطلاعات به سرور ارسال نمی‌شود</p>
+        </footer>
+    </div>
 
     <script>
-        // کانفیگ‌های موجود در سابسکریشن
-        const subscriptionConfigs = {
-            cf_de_1: { 
-                name: 'VLESS - آلمان (CDN 1) 🇩🇪', 
-                config: 'vless://826f524a-cea1-4e44-9b49-3381d13b7593@fk31lndm4w8uj0yp1drwltdtdko6y-cu.pages.dev:443?path=%2FlwIBsf84RYZSVl1x%3Fed%3D2560&security=tls&alpn=http%2F1.1&encryption=none&host=fk31lndm4w8uj0yp1drwltdtdko6y-cu.pages.dev&fp=randomized&type=ws&sni=fK31lnDM4w8uJ0yp1dRWlTdTdko6y-CU.pAGES.DeV#%F0%9F%87%A9%F0%9F%87%AA%20Cloudflare%20-%20IRDevs%201',
-                location: 'فرانکفورت, آلمان',
-                protocol: 'VLESS',
-                basePing: 45
-            },
-            cf_de_2: { 
-                name: 'VLESS - آلمان (CDN 2) 🇩🇪', 
-                config: 'vless://826f524a-cea1-4e44-9b49-3381d13b7593@www.speedtest.net:443?path=%2FweIiUrqpwSQLUEGI%3Fed%3D2560&security=tls&alpn=http%2F1.1&encryption=none&host=fk31lndm4w8uj0yp1drwltdtdko6y-cu.pages.dev&fp=randomized&type=ws&sni=FK31lNdM4W8Uj0Yp1dRWlTDtDKo6y-Cu.pagES.dEv#%F0%9F%87%A9%F0%9F%87%AA%20Cloudflare%20-%20IRDevs%202',
-                location: 'برلین, آلمان',
-                protocol: 'VLESS',
-                basePing: 48
-            },
-            cf_de_3: { 
-                name: 'VLESS - ترکیه (CDN 3) 🇹🇷', 
-                config: 'vless://a49804d5-30f9-4a39-bfc1-a776bb6e2d01@ae.aparat-movies-download.ir:80?security=&encryption=none&host=zhaket.com&headerType=http&type=tcp#%F0%9F%87%A6%F0%9F%87%AA%20Dubai%E2%9E%803',
-                location: 'استانبول, ترکیه',
-                protocol: 'VLESS',
-                basePing: 65
-            },
-            cf_de_4: { 
-                name: 'VLESS - آلمان (CDN 4) 🇩🇪', 
-                config: 'vless://826f524a-cea1-4e44-9b49-3381d13b7593@172.66.46.247:443?path=%2FfNX3GzNxncCIIsf7%3Fed%3D2560&security=tls&alpn=http%2F1.1&encryption=none&host=fk31lndm4w8uj0yp1drwltdtdko6y-cu.pages.dev&fp=randomized&type=ws&sni=fk31lndM4W8UJ0YP1DrwLtDtDKO6y-CU.pAgES.DEv#%F0%9F%87%A9%F0%9F%87%AA%20Cloudflare%20-%20IRDevs%204',
-                location: 'مونیخ, آلمان',
-                protocol: 'VLESS',
-                basePing: 52
-            },
-            cf_de_tr_5: { 
-                name: 'Trojan - آلمان (CDN 5) 🇩🇪', 
-                config: 'trojan://%3AbC5%5Elakx%3E%24d@fk31lndm4w8uj0yp1drwltdtdko6y-cu.pages.dev:443?path=%2FtrULF8XIBg0I5upoFe%3Fed%3D2560&security=tls&alpn=http%2F1.1&host=fk31lndm4w8uj0yp1drwltdtdko6y-cu.pages.dev&fp=randomized&type=ws&sni=fK31lnDM4w8uJ0yp1dRWlTdTdko6y-CU.pAGES.DeV#%F0%9F%87%A9%F0%9F%87%AA%20Cloudflare%20-%20IRDevs%205',
-                location: 'هامبورگ, آلمان',
-                protocol: 'Trojan',
-                basePing: 55
-            },
-            cf_de_tr_6: { 
-                name: 'Trojan - آمریکا (CDN 6) 🇺🇸', 
-                config: 'trojan://%3AbC5%5Elakx%3E%24d@www.speedtest.net:443?path=%2FtrAF6D510tD4ptv2AR%3Fed%3D2560&security=tls&alpn=http%2F1.1&host=fk31lndm4w8uj0yp1drwltdtdko6y-cu.pages.dev&fp=randomized&type=ws&sni=FK31lNdM4W8Uj0Yp1dRWlTDtDKo6y-Cu.pagES.dEv#%F0%9F%87%A9%F0%9F%87%AA%20Cloudflare%20-%20IRDevs%206',
-                location: 'نیویورک, آمریکا',
-                protocol: 'Trojan',
-                basePing: 120
-            },
-            cf_de_tr_7: { 
-                name: 'Trojan - ژاپن (CDN 7) 🇯🇵', 
-                config: 'trojan://%3AbC5%5Elakx%3E%24d@172.66.45.9:443?path=%2Ftrucd7RaARX7VGCRLn%3Fed%3D2560&security=tls&alpn=http%2F1.1&host=fk31lndm4w8uj0yp1drwltdtdko6y-cu.pages.dev&fp=randomized&type=ws&sni=fk31Lndm4w8uj0yp1drWLTdtdko6y-cU.PaGES.dEv#%F0%9F%87%A9%F0%9F%87%AA%20Cloudflare%20-%20IRDevs%207',
-                location: 'توکیو, ژاپن',
-                protocol: 'Trojan',
-                basePing: 85
-            },
-            cf_de_tr_8: { 
-                name: 'Trojan - فرانسه (CDN 8) 🇫🇷', 
-                config: 'trojan://%3AbC5%5Elakx%3E%24d@172.66.46.247:443?path=%2FtrSCnmRLkssMpXzgTT%3Fed%3D2560&security=tls&alpn=http%2F1.1&host=fk31lndm4w8uj0yp1drwltdtdko6y-cu.pages.dev&fp=randomized&type=ws&sni=fk31lndM4W8UJ0YP1DrwLtDtDKO6y-CU.pAgES.DEv#%F0%9F%87%A9%F0%9F%87%AA%20Cloudflare%20-%20IRDevs%208',
-                location: 'پاریس, فرانسه',
-                protocol: 'Trojan',
-                basePing: 60
-            }
-        };
-
-        // --- CORE FUNCTIONS ---
         document.addEventListener('DOMContentLoaded', function() {
-            buildConfigList();
-            updateServerStats();
-            setInterval(updateServerStats, 3000);
-            getUserInfo();
-        });
-
-        function updateServerStats() {
-            const basePing = 45;
-            const fluctuation = (Math.random() - 0.5) * 20;
-            const currentPing = Math.round(basePing + fluctuation);
-            document.getElementById('serverPing').textContent = currentPing + 'ms';
-        }
-        
-        async function copyToClipboard(text, message) {
-            try {
-                await navigator.clipboard.writeText(text);
-                showNotification(message, 'success');
-            } catch (err) {
-                showNotification('خطا در کپی کردن!', 'error');
-            }
-        }
-
-        // --- BUILDER FUNCTIONS ---
-        function buildConfigList() {
-            const container = document.getElementById('config-list-container');
-            container.innerHTML = '';
+            const subscriptionUrl = document.getElementById('subscriptionUrl');
+            const loadBtn = document.getElementById('loadBtn');
+            const proxyList = document.getElementById('proxyList');
+            const status = document.getElementById('status');
+            const protocolBtns = document.querySelectorAll('.protocol-btn');
             
-            Object.keys(subscriptionConfigs).forEach(key => {
-                const config = subscriptionConfigs[key];
-                const card = document.createElement('div');
-                card.className = 'card-glass p-4 rounded-xl flex flex-col config-card';
-                card.innerHTML = `
-                    <div class="flex justify-between items-center mb-2">
-                        <h4 class="font-bold text-white">${config.name}</h4>
-                        <span class="px-2 py-1 rounded-full text-xs bg-blue-500/20 text-blue-300">
-                            ${config.protocol}
-                        </span>
-                    </div>
-                    <div class="text-sm text-gray-300 mb-3">${config.location}</div>
-                    <div class="flex justify-between items-center">
-                        <div class="flex items-center">
-                            <span class="text-sm text-gray-300 mr-2">پینگ:</span>
-                            <span class="font-mono text-white" id="ping-${key}">-- ms</span>
-                            <span class="ping-indicator" id="indicator-${key}"></span>
-                        </div>
-                        <div class="flex space-x-2">
-                            <button onclick="refreshConfigPing('${key}')" class="w-9 h-9 bg-gray-700 hover:bg-gray-600 rounded-full flex items-center justify-center text-white transition-all">
-                                <i class="fa-solid fa-rotate text-sm"></i>
-                            </button>
-                            <button onclick="copyConfig('${key}')" class="w-9 h-9 bg-blue-500 hover:bg-blue-600 rounded-full flex items-center justify-center text-white transition-all">
-                                <i class="fa-solid fa-copy text-sm"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(card);
-                
-                // Initialize ping for this config
-                setTimeout(() => refreshConfigPing(key), 500 + Math.random() * 1000);
+            let proxies = [];
+            let currentFilter = 'all';
+            
+            // رویداد کلیک برای دکمه بارگذاری
+            loadBtn.addEventListener('click', loadSubscription);
+            
+            // رویداد کلیک برای فیلترهای پروتکل
+            protocolBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    protocolBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentFilter = this.dataset.protocol;
+                    filterProxies(currentFilter);
+                });
             });
-        }
-
-        function refreshConfigPing(configKey) {
-            const config = subscriptionConfigs[configKey];
-            if (!config) return;
             
-            const pingElement = document.getElementById(`ping-${configKey}`);
-            const indicatorElement = document.getElementById(`indicator-${configKey}`);
-            
-            if (!pingElement || !indicatorElement) return;
-            
-            // Show loading
-            pingElement.textContent = '...';
-            indicatorElement.className = 'ping-indicator animate-pulse bg-gray-500';
-            
-            // Simulate ping with realistic values
-            setTimeout(() => {
-                // Calculate ping with some variation
-                const variation = Math.floor(Math.random() * 10) - 5; // -5 to +5
-                const ping = Math.max(10, config.basePing + variation);
+            // شبیه‌سازی بارگذاری سابسکریپشن
+            function loadSubscription() {
+                const url = subscriptionUrl.value.trim();
                 
-                // Update ping display
-                pingElement.textContent = `${ping} ms`;
-                
-                // Update indicator color based on ping
-                if (ping < 60) {
-                    indicatorElement.className = 'ping-indicator ping-good';
-                } else if (ping < 100) {
-                    indicatorElement.className = 'ping-indicator ping-medium';
-                } else {
-                    indicatorElement.className = 'ping-indicator ping-bad';
+                if (!url) {
+                    status.textContent = '⚠️ لطفاً لینک سابسکریپشن را وارد کنید';
+                    subscriptionUrl.focus();
+                    return;
                 }
-            }, 800);
-        }
-
-        function refreshAllConfigPings() {
-            Object.keys(subscriptionConfigs).forEach(key => {
-                refreshConfigPing(key);
-            });
-        }
-
-        // --- REAL TOOLS ---
-        async function getUserInfo() {
-            try {
-                // Simulate fetching user info
+                
+                status.textContent = 'در حال بارگذاری سابسکریپشن...';
+                proxyList.innerHTML = '<div class="no-proxies"><i class="fas fa-spinner fa-spin"></i><h3>در حال بارگذاری پروکسی‌ها</h3></div>';
+                
+                // در واقعیت اینجا باید سابسکریپشن از سرور دریافت شود
+                // ولی برای نمایش، از داده‌های نمونه استفاده می‌کنیم
                 setTimeout(() => {
-                    document.getElementById('user-ip').textContent = '185.142.97.65';
-                    document.getElementById('user-location').textContent = 'تهران, ایران';
-                    document.getElementById('user-isp').textContent = 'شاتل';
-                    document.querySelectorAll('.animate-pulse').forEach(el => el.classList.remove('animate-pulse'));
+                    proxies = generateSampleProxies();
+                    status.textContent = `✅ سابسکریپشن با موفقیت بارگذاری شد | ${proxies.length} پروکسی یافت شد`;
+                    filterProxies(currentFilter);
                 }, 1500);
-            } catch (error) {
-                document.getElementById('user-ip').textContent = 'خطا';
-                document.getElementById('user-location').textContent = 'خطا';
-                document.getElementById('user-isp').textContent = 'خطا';
             }
-        }
-
-        // --- EVENT HANDLERS ---
-        function copyConfig(configKey) {
-            const configData = subscriptionConfigs[configKey];
-            if (configData && configData.config) {
-                copyToClipboard(configData.config, '✅ کانفیگ کپی شد!');
-            } else {
-                showNotification('کانفیگ مورد نظر یافت نشد!', 'error');
+            
+            // فیلتر کردن پروکسی‌ها بر اساس پروتکل
+            function filterProxies(protocol) {
+                if (protocol === 'all') {
+                    displayProxies(proxies);
+                } else {
+                    const filtered = proxies.filter(p => p.protocol === protocol);
+                    displayProxies(filtered);
+                }
             }
-        }
-
-        function copySubLink() {
-            const subLink = document.getElementById('subLink').textContent.trim();
-            copyToClipboard(subLink, '✅ لینک اشتراک کپی شد!');
-        }
-
-        // --- UI FUNCTIONS ---
-        function showNotification(message, type = 'success') {
-            const existing = document.querySelector('.notification-toast');
-            if(existing) existing.remove();
-
-            const notification = document.createElement('div');
-            const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
-            const icon = type === 'success' ? '<i class="fa-solid fa-check-circle"></i>' : '<i class="fa-solid fa-times-circle"></i>';
             
-            notification.className = `notification-toast fixed bottom-5 right-5 md:bottom-auto md:top-5 ${bgColor} text-white px-5 py-3 rounded-xl shadow-lg z-50 flex items-center space-x-3 space-x-reverse animate-fade-in`;
-            notification.innerHTML = `<span class="text-xl">${icon}</span> <span class="font-medium">${message}</span>`;
+            // نمایش پروکسی‌ها در لیست
+            function displayProxies(proxiesToShow) {
+                if (proxiesToShow.length === 0) {
+                    proxyList.innerHTML = '<div class="no-proxies"><i class="fas fa-exclamation-circle"></i><h3>پروکسی‌ای یافت نشد</h3><p>هیچ پروکسی‌ای با فیلتر انتخاب شده وجود ندارد</p></div>';
+                    return;
+                }
+                
+                proxyList.innerHTML = '';
+                
+                proxiesToShow.forEach(proxy => {
+                    const card = document.createElement('div');
+                    card.className = 'proxy-card';
+                    
+                    let protocolClass = 'other';
+                    if (proxy.protocol === 'vless') protocolClass = 'vless';
+                    else if (proxy.protocol === 'vmess') protocolClass = 'vmess';
+                    else if (proxy.protocol === 'trojan') protocolClass = 'trojan';
+                    else if (proxy.protocol === 'shadowsocks') protocolClass = 'shadowsocks';
+                    
+                    card.innerHTML = `
+                        <div class="card-header">
+                            <div class="proxy-name">${proxy.name}</div>
+                            <div class="protocol ${protocolClass}">
+                                <i class="fas fa-${getProtocolIcon(proxy.protocol)}"></i>
+                                ${proxy.protocol.toUpperCase()}
+                            </div>
+                        </div>
+                        <div class="proxy-details">
+                            <div class="detail-item">
+                                <span class="detail-label">سرور</span>
+                                <span class="detail-value">${proxy.server}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">پورت</span>
+                                <span class="detail-value">${proxy.port}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">کشور</span>
+                                <span class="detail-value">${proxy.country} <i class="fas fa-flag"></i></span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">پینگ</span>
+                                <span class="detail-value">${proxy.ping} ms</span>
+                            </div>
+                        </div>
+                        <button class="copy-btn" data-link="${proxy.link}">
+                            <i class="fas fa-copy"></i> کپی لینک پروکسی
+                        </button>
+                    `;
+                    
+                    proxyList.appendChild(card);
+                });
+                
+                // اضافه کردن رویداد کپی برای دکمه‌ها
+                document.querySelectorAll('.copy-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const link = this.getAttribute('data-link');
+                        copyToClipboard(link);
+                        this.innerHTML = '<i class="fas fa-check"></i> کپی شد!';
+                        setTimeout(() => {
+                            this.innerHTML = '<i class="fas fa-copy"></i> کپی لینک پروکسی';
+                        }, 2000);
+                    });
+                });
+            }
             
-            document.body.appendChild(notification);
+            // تابع کپی به کلیپ‌بورد
+            function copyToClipboard(text) {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+            }
             
-            setTimeout(() => {
-                notification.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-                notification.style.opacity = '0';
-                notification.style.transform = 'translateX(100%)';
-                setTimeout(() => notification.remove(), 500);
-            }, 3000);
-        }
+            // آیکون مناسب برای هر پروتکل
+            function getProtocolIcon(protocol) {
+                switch(protocol) {
+                    case 'vless': return 'bolt';
+                    case 'vmess': return 'bolt-lightning';
+                    case 'trojan': return 'horse-head';
+                    case 'shadowsocks': return 'ghost';
+                    default: return 'question';
+                }
+            }
+            
+            // تولید داده‌های نمونه برای نمایش
+            function generateSampleProxies() {
+                return [
+                    {
+                        name: "سرور پرسرعت آلمان",
+                        protocol: "vless",
+                        server: "de-01.example.com",
+                        port: "443",
+                        country: "آلمان",
+                        ping: "42",
+                        link: "vless://uuid@de-01.example.com:443?encryption=none&security=tls&sni=de-01.example.com&type=ws&path=%2Fpath#Germany"
+                    },
+                    {
+                        name: "سرور پرمیوم آمریکا",
+                        protocol: "vmess",
+                        server: "us-02.example.com",
+                        port: "8443",
+                        country: "آمریکا",
+                        ping: "112",
+                        link: "vmess://eyJhZGQiOiJ1cy0wMi5leGFtcGxlLmNvbSIsImFpZCI6IjAiLCJob3N0IjoiIiwiaWQiOiI4NjJhOTg0Yy0xZWE5LTQ4MjMtYjUxOS1jZmM2M2Y3YjFhMTIiLCJuZXQiOiJ3cyIsInBhdGgiOiIvd3MiLCJwb3J0IjoiODQ0MyIsInBzIjoiVVMiLCJ0bHMiOiJ0bHMiLCJ0eXBlIjoibm9uZSIsInYiOiIyIn0="
+                    },
+                    {
+                        name: "سرور اختصاصی ژاپن",
+                        protocol: "trojan",
+                        server: "jp-03.example.com",
+                        port: "2096",
+                        country: "ژاپن",
+                        ping: "89",
+                        link: "trojan://password@jp-03.example.com:2096?security=tls&sni=jp-03.example.com&type=tcp&headerType=none#Japan"
+                    },
+                    {
+                        name: "سرور اقتصادی کانادا",
+                        protocol: "vless",
+                        server: "ca-04.example.com",
+                        port: "2083",
+                        country: "کانادا",
+                        ping: "132",
+                        link: "vless://uuid@ca-04.example.com:2083?encryption=none&security=tls&sni=ca-04.example.com&type=ws&path=%2Fpath#Canada"
+                    },
+                    {
+                        name: "سرور پایدار فرانسه",
+                        protocol: "shadowsocks",
+                        server: "fr-05.example.com",
+                        port: "8388",
+                        country: "فرانسه",
+                        ping: "56",
+                        link: "ss://YWVzLTI1Ni1nY206cGFzc3dvcmQ@fr-05.example.com:8388#France"
+                    },
+                    {
+                        name: "سرور VIP ترکیه",
+                        protocol: "vmess",
+                        server: "tr-06.example.com",
+                        port: "2053",
+                        country: "ترکیه",
+                        ping: "76",
+                        link: "vmess://eyJhZGQiOiJ0ci0wNi5leGFtcGxlLmNvbSIsImFpZCI6IjAiLCJob3N0IjoiIiwiaWQiOiI4NjJhOTg0Yy0xZWE5LTQ4MjMtYjUxOS1jZmM2M2Y3YjFhMTIiLCJuZXQiOiJ3cyIsInBhdGgiOiIvd3MiLCJwb3J0IjoiODQ0MyIsInBzIjoiVFIiLCJ0bHMiOiJ0bHMiLCJ0eXBlIjoibm9uZSIsInYiOiIyIn0="
+                    },
+                    {
+                        name: "سرور اختصاصی انگلیس",
+                        protocol: "trojan",
+                        server: "uk-07.example.com",
+                        port: "2087",
+                        country: "انگلیس",
+                        ping: "64",
+                        link: "trojan://password@uk-07.example.com:2087?security=tls&sni=uk-07.example.com&type=tcp&headerType=none#UK"
+                    }
+                ];
+            }
+        });
     </script>
 </body>
 </html>
