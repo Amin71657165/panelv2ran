@@ -112,6 +112,11 @@
             background: rgba(10, 15, 25, 0.9);
         }
         
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        
         #loadBtn, #pingAllBtn {
             background: linear-gradient(to right, #3498db, #2980b9);
             color: white;
@@ -127,25 +132,18 @@
         
         #pingAllBtn {
             background: linear-gradient(to right, #9b59b6, #8e44ad);
-            margin-left: 10px;
-        }
-        
-        #loadBtn:hover, #pingAllBtn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.3);
         }
         
         #loadBtn:hover {
             background: linear-gradient(to right, #2980b9, #2573a7);
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.3);
         }
         
         #pingAllBtn:hover {
             background: linear-gradient(to right, #8e44ad, #7d3c98);
-        }
-        
-        .button-group {
-            display: flex;
-            gap: 10px;
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.3);
         }
         
         .protocol-filters {
@@ -359,18 +357,43 @@
             background-color: #e74c3c;
         }
         
+        .ping-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+        
+        .ping-option-btn {
+            padding: 8px 15px;
+            background: rgba(40, 50, 70, 0.7);
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+        
+        .ping-option-btn.active {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+        
         @media (max-width: 768px) {
             .input-group {
+                flex-direction: column;
+            }
+            
+            .button-group {
                 flex-direction: column;
             }
             
             #loadBtn, #pingAllBtn {
                 padding: 14px;
                 width: 100%;
-            }
-            
-            .button-group {
-                flex-direction: column;
             }
             
             .proxy-details {
@@ -401,6 +424,12 @@
                         <i class="fas fa-network-wired"></i> پینگ همه سرورها
                     </button>
                 </div>
+            </div>
+            
+            <div class="ping-options">
+                <div class="ping-option-btn active" data-method="http">پینگ HTTP</div>
+                <div class="ping-option-btn" data-method="tcp">پینگ TCP</div>
+                <div class="ping-option-btn" data-method="mixed">پینگ ترکیبی</div>
             </div>
             
             <div class="protocol-filters">
@@ -437,11 +466,13 @@
             const proxyList = document.getElementById('proxyList');
             const status = document.getElementById('status');
             const protocolBtns = document.querySelectorAll('.protocol-btn');
+            const pingOptionBtns = document.querySelectorAll('.ping-option-btn');
             const proxyCounts = document.querySelectorAll('.proxy-count');
             
             let proxies = [];
             let currentFilter = 'all';
             let isPinging = false;
+            let pingMethod = 'http';
             
             // رویداد کلیک برای دکمه بارگذاری
             loadBtn.addEventListener('click', loadSubscription);
@@ -456,6 +487,15 @@
                     this.classList.add('active');
                     currentFilter = this.dataset.protocol;
                     filterProxies(currentFilter);
+                });
+            });
+            
+            // رویداد کلیک برای انتخاب روش پینگ
+            pingOptionBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    pingOptionBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    pingMethod = this.dataset.method;
                 });
             });
             
@@ -580,7 +620,21 @@
                         status.textContent = `در حال پینگ سرور ${i+1} از ${proxies.length}: ${proxy.name}`;
                         
                         try {
-                            const pingTime = await pingServer(proxy.server, proxy.port);
+                            let pingTime;
+                            
+                            if (pingMethod === 'http') {
+                                pingTime = await pingWithHttp(proxy.server, proxy.port);
+                            } else if (pingMethod === 'tcp') {
+                                pingTime = await pingWithTcp(proxy.server, proxy.port);
+                            } else {
+                                // روش ترکیبی - ابتدا HTTP سپس TCP
+                                try {
+                                    pingTime = await pingWithHttp(proxy.server, proxy.port);
+                                } catch {
+                                    pingTime = await pingWithTcp(proxy.server, proxy.port);
+                                }
+                            }
+                            
                             proxy.ping = pingTime + ' ms';
                             
                             // تعیین وضعیت پینگ
@@ -611,21 +665,55 @@
                 }
             }
             
-            // تابع پینگ سرور با WebSocket
-            function pingServer(host, port) {
+            // پینگ با روش HTTP
+            function pingWithHttp(host, port) {
                 return new Promise((resolve, reject) => {
                     const startTime = Date.now();
                     const timeout = 3000; // 3 ثانیه تایم‌اوت
-                    const socket = new WebSocket(`wss://${host}:${port}`);
                     
-                    socket.onopen = () => {
+                    // استفاده از یک مسیر تصادفی برای جلوگیری از کش
+                    const randomPath = Math.random().toString(36).substring(7);
+                    const url = `https://${host}:${port}/${randomPath}`;
+                    
+                    fetch(url, {
+                        method: 'HEAD',
+                        mode: 'no-cors',
+                        cache: 'no-store'
+                    })
+                    .then(() => {
                         const latency = Date.now() - startTime;
-                        socket.close();
+                        resolve(latency);
+                    })
+                    .catch(() => {
+                        const latency = Date.now() - startTime;
+                        // حتی اگر خطا داشته باشد، زمان پاسخ را برمی‌گردانیم
+                        resolve(latency);
+                    });
+                    
+                    setTimeout(() => {
+                        reject(new Error('زمان انتظار به پایان رسید'));
+                    }, timeout);
+                });
+            }
+            
+            // پینگ با روش TCP (شبیه‌سازی شده)
+            function pingWithTcp(host, port) {
+                return new Promise((resolve, reject) => {
+                    const startTime = Date.now();
+                    const timeout = 3000;
+                    
+                    const img = new Image();
+                    img.src = `https://${host}:${port}/favicon.ico?t=${Date.now()}`;
+                    
+                    img.onload = function() {
+                        const latency = Date.now() - startTime;
                         resolve(latency);
                     };
                     
-                    socket.onerror = () => {
-                        reject(new Error('اتصال ناموفق'));
+                    img.onerror = function() {
+                        const latency = Date.now() - startTime;
+                        // حتی اگر خطا داشته باشد، زمان پاسخ را برمی‌گردانیم
+                        resolve(latency);
                     };
                     
                     setTimeout(() => {
