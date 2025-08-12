@@ -14,8 +14,8 @@
         }
         
         body {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
-            color: #333;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
             min-height: 100vh;
             padding: 20px;
             display: flex;
@@ -26,17 +26,32 @@
         .container {
             width: 100%;
             max-width: 1000px;
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(25, 32, 45, 0.9);
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
             overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         header {
-            background: linear-gradient(to right, #2c3e50, #4a6491);
+            background: linear-gradient(to right, #1a2980, #26d0ce);
             color: white;
             padding: 25px 30px;
             text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
         }
         
         header h1 {
@@ -46,6 +61,8 @@
             align-items: center;
             justify-content: center;
             gap: 12px;
+            position: relative;
+            z-index: 2;
         }
         
         header h1 i {
@@ -58,11 +75,13 @@
             max-width: 700px;
             margin: 0 auto;
             line-height: 1.6;
+            position: relative;
+            z-index: 2;
         }
         
         .input-section {
             padding: 30px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .input-group {
@@ -74,16 +93,23 @@
         #subscriptionUrl {
             flex: 1;
             padding: 14px 20px;
-            border: 2px solid #ddd;
+            background: rgba(10, 15, 25, 0.7);
+            border: 2px solid rgba(52, 152, 219, 0.3);
             border-radius: 8px;
             font-size: 16px;
             transition: all 0.3s;
+            color: white;
+        }
+        
+        #subscriptionUrl::placeholder {
+            color: rgba(255, 255, 255, 0.5);
         }
         
         #subscriptionUrl:focus {
             border-color: #3498db;
             outline: none;
             box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            background: rgba(10, 15, 25, 0.9);
         }
         
         #loadBtn {
@@ -96,12 +122,13 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
         
         #loadBtn:hover {
             background: linear-gradient(to right, #2980b9, #2573a7);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.3);
         }
         
         .protocol-filters {
@@ -114,18 +141,24 @@
         
         .protocol-btn {
             padding: 10px 20px;
-            background: #f1f2f6;
-            border: 1px solid #ddd;
+            background: rgba(30, 40, 60, 0.7);
+            border: 1px solid rgba(52, 152, 219, 0.3);
             border-radius: 30px;
             cursor: pointer;
             transition: all 0.2s;
             font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .protocol-btn:hover {
+            background: rgba(52, 152, 219, 0.3);
         }
         
         .protocol-btn.active {
             background: #3498db;
             color: white;
             border-color: #3498db;
+            box-shadow: 0 0 15px rgba(52, 152, 219, 0.4);
         }
         
         .proxy-list {
@@ -135,20 +168,31 @@
         }
         
         .proxy-card {
-            background: white;
-            border: 1px solid #e0e6ed;
+            background: linear-gradient(135deg, rgba(30, 40, 60, 0.7), rgba(15, 22, 40, 0.8));
+            border: 1px solid rgba(52, 152, 219, 0.2);
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 15px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             transition: all 0.3s;
             position: relative;
+            overflow: hidden;
         }
         
         .proxy-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            border-color: #3498db;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            border-color: rgba(52, 152, 219, 0.5);
+        }
+        
+        .proxy-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to right, #3498db, #2980b9);
         }
         
         .card-header {
@@ -167,7 +211,7 @@
         }
         
         .protocol.vless {
-            color: #e74c3c;
+            color: #ff6b6b;
         }
         
         .protocol.vmess {
@@ -175,21 +219,21 @@
         }
         
         .protocol.trojan {
-            color: #1abc9c;
+            color: #1dd1a1;
         }
         
         .protocol.shadowsocks {
-            color: #f39c12;
+            color: #feca57;
         }
         
         .protocol.other {
-            color: #7f8c8d;
+            color: #c8d6e5;
         }
         
         .proxy-name {
             font-weight: 600;
             font-size: 18px;
-            color: #2c3e50;
+            color: #c8d6e5;
         }
         
         .proxy-details {
@@ -206,13 +250,14 @@
         
         .detail-label {
             font-size: 13px;
-            color: #7f8c8d;
+            color: #8395a7;
             margin-bottom: 5px;
         }
         
         .detail-value {
             font-weight: 500;
             word-break: break-all;
+            color: #f1f2f6;
         }
         
         .copy-btn {
@@ -228,39 +273,53 @@
             align-items: center;
             gap: 8px;
             transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            justify-content: center;
         }
         
         .copy-btn:hover {
             background: linear-gradient(to right, #27ae60, #219653);
             transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.3);
         }
         
         .no-proxies {
             text-align: center;
             padding: 40px;
-            color: #7f8c8d;
+            color: #8395a7;
         }
         
         .no-proxies i {
             font-size: 50px;
             margin-bottom: 20px;
-            color: #bdc3c7;
+            color: rgba(189, 195, 199, 0.3);
         }
         
         .status {
             text-align: center;
             padding: 15px;
             font-weight: 500;
-            color: #7f8c8d;
+            color: #8395a7;
+            background: rgba(15, 22, 40, 0.7);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         footer {
             text-align: center;
             padding: 20px;
-            color: #7f8c8d;
+            color: #8395a7;
             font-size: 14px;
-            border-top: 1px solid #eee;
-            background: #f8f9fa;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(15, 22, 40, 0.7);
+        }
+        
+        .proxy-count {
+            background: rgba(52, 152, 219, 0.2);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-left: 10px;
         }
         
         @media (max-width: 768px) {
@@ -285,31 +344,31 @@
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-shield-alt"></i> مدیریت سابسکریپشن پروکسی</h1>
-            <p class="subtitle">لینک سابسکریپشن خود را وارد کنید تا تمامی پروکسی‌ها (Vless, VMess, Trojan و ...) به صورت لیست نمایش داده شوند. هر پروکسی را می‌توانید با یک کلیک کپی کنید.</p>
+            <h1><i class="fas fa-server"></i> مدیریت سابسکریپشن پروکسی</h1>
+            <p class="subtitle">لینک سابسکریپشن خود را وارد کنید تا تمامی کانفیگ‌ها استخراج و نمایش داده شوند. هر کانفیگ را می‌توانید با یک کلیک کپی کنید.</p>
         </header>
         
         <div class="input-section">
             <div class="input-group">
-                <input type="url" id="subscriptionUrl" placeholder="https://example.com/subscription/link" autocomplete="off">
+                <input type="url" id="subscriptionUrl" placeholder="https://raw.githubusercontent.com/example/subscription" autocomplete="off" value="https://raw.githubusercontent.com/Mosifree/-FREE2CONFIG/refs/heads/main/Movaghat">
                 <button id="loadBtn">
                     <i class="fas fa-download"></i> بارگذاری سابسکریپشن
                 </button>
             </div>
             
             <div class="protocol-filters">
-                <div class="protocol-btn active" data-protocol="all">همه</div>
-                <div class="protocol-btn" data-protocol="vless">Vless</div>
-                <div class="protocol-btn" data-protocol="vmess">VMess</div>
-                <div class="protocol-btn" data-protocol="trojan">Trojan</div>
-                <div class="protocol-btn" data-protocol="shadowsocks">Shadowsocks</div>
+                <div class="protocol-btn active" data-protocol="all">همه <span class="proxy-count">0</span></div>
+                <div class="protocol-btn" data-protocol="vless">Vless <span class="proxy-count">0</span></div>
+                <div class="protocol-btn" data-protocol="vmess">VMess <span class="proxy-count">0</span></div>
+                <div class="protocol-btn" data-protocol="trojan">Trojan <span class="proxy-count">0</span></div>
+                <div class="protocol-btn" data-protocol="shadowsocks">Shadowsocks <span class="proxy-count">0</span></div>
             </div>
         </div>
         
         <div class="proxy-list" id="proxyList">
             <div class="no-proxies">
                 <i class="fas fa-cloud-download-alt"></i>
-                <h3>هنوز پروکسی‌ای بارگذاری نشده است</h3>
+                <h3>هنوز کانفیگی بارگذاری نشده است</h3>
                 <p>لطفاً لینک سابسکریپشن خود را وارد کرده و دکمه بارگذاری را بزنید</p>
             </div>
         </div>
@@ -319,7 +378,7 @@
         </div>
         
         <footer>
-            <p>ساخته شده با ❤️ | تمامی محاسبات در مرورگر شما انجام می‌شود و اطلاعات به سرور ارسال نمی‌شود</p>
+            <p>ساخته شده با ❤️ | اطلاعات سابسکریپشن مستقیماً از لینک شما دریافت می‌شود و به سرور ارسال نمی‌شود</p>
         </footer>
     </div>
 
@@ -330,6 +389,7 @@
             const proxyList = document.getElementById('proxyList');
             const status = document.getElementById('status');
             const protocolBtns = document.querySelectorAll('.protocol-btn');
+            const proxyCounts = document.querySelectorAll('.proxy-count');
             
             let proxies = [];
             let currentFilter = 'all';
@@ -358,16 +418,89 @@
                 }
                 
                 status.textContent = 'در حال بارگذاری سابسکریپشن...';
-                proxyList.innerHTML = '<div class="no-proxies"><i class="fas fa-spinner fa-spin"></i><h3>در حال بارگذاری پروکسی‌ها</h3></div>';
+                proxyList.innerHTML = '<div class="no-proxies"><i class="fas fa-spinner fa-spin"></i><h3>در حال بارگذاری کانفیگ‌ها</h3></div>';
                 
                 try {
-                    // شبیه‌سازی دریافت سابسکریپشن از سرور
-                    const subscriptionData = await fetchSubscription(url);
+                    // استفاده از CORS proxy برای دور زدن محدودیت‌های CORS
+                    const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
+                    const response = await fetch(proxyUrl);
                     
-                    // تجزیه و تحلیل سابسکریپشن
-                    proxies = parseSubscription(subscriptionData);
+                    if (!response.ok) {
+                        throw new Error('خطا در دریافت سابسکریپشن: ' + response.status);
+                    }
                     
-                    status.textContent = `✅ سابسکریپشن با موفقیت بارگذاری شد | ${proxies.length} پروکسی یافت شد`;
+                    const base64Data = await response.text();
+                    // دیکد base64
+                    const decodedData = atob(base64Data);
+                    // تقسیم به خطوط
+                    const lines = decodedData.split('\n').filter(line => line.trim() !== '');
+                    
+                    proxies = [];
+                    lines.forEach(line => {
+                        line = line.trim();
+                        let name = 'بدون نام';
+                        let protocol = 'other';
+                        
+                        // استخراج نام از قسمت بعد از #
+                        const hashIndex = line.lastIndexOf('#');
+                        if (hashIndex !== -1) {
+                            name = decodeURIComponent(line.substring(hashIndex + 1));
+                            line = line.substring(0, hashIndex);
+                        }
+                        
+                        // تشخیص پروتکل
+                        if (line.startsWith('vless://')) {
+                            protocol = 'vless';
+                        } else if (line.startsWith('vmess://')) {
+                            protocol = 'vmess';
+                        } else if (line.startsWith('trojan://')) {
+                            protocol = 'trojan';
+                        } else if (line.startsWith('ss://')) {
+                            protocol = 'shadowsocks';
+                        }
+                        
+                        // استخراج اطلاعات سرور و پورت
+                        let server = 'نامشخص';
+                        let port = 'نامشخص';
+                        
+                        try {
+                            // برای پروتکل‌های غیر از vmess
+                            if (protocol !== 'vmess') {
+                                const urlObj = new URL(line);
+                                server = urlObj.hostname;
+                                port = urlObj.port || '443';
+                            } else {
+                                // برای vmess
+                                const vmessContent = line.substring(8);
+                                const decoded = atob(vmessContent);
+                                const vmessConfig = JSON.parse(decoded);
+                                server = vmessConfig.add;
+                                port = vmessConfig.port;
+                                // استفاده از نام موجود در کانفیگ اگر وجود داشت
+                                if (vmessConfig.ps && name === 'بدون نام') {
+                                    name = vmessConfig.ps;
+                                }
+                            }
+                        } catch (e) {
+                            console.error('خطا در تجزیه کانفیگ:', e);
+                        }
+                        
+                        // اضافه کردن پروکسی به لیست
+                        proxies.push({
+                            name: name,
+                            protocol: protocol,
+                            link: line,
+                            server: server,
+                            port: port,
+                            country: 'نامشخص',
+                            ping: '---'
+                        });
+                    });
+                    
+                    // به‌روزرسانی تعداد پروکسی‌ها در فیلترها
+                    updateFilterCounts();
+                    
+                    status.textContent = `✅ سابسکریپشن با موفقیت بارگذاری شد | ${proxies.length} کانفیگ یافت شد`;
                     filterProxies(currentFilter);
                 } catch (error) {
                     console.error(error);
@@ -376,26 +509,21 @@
                 }
             }
             
-            // شبیه‌سازی دریافت سابسکریپشن
-            function fetchSubscription(url) {
-                return new Promise((resolve, reject) => {
-                    setTimeout(() => {
-                        // در واقعیت اینجا باید سابسکریپشن از سرور دریافت شود
-                        // ولی برای نمایش، از داده‌های نمونه استفاده می‌کنیم
-                        const subscriptionData = {
-                            url: url,
-                            proxies: generateSampleProxies()
-                        };
-                        resolve(subscriptionData);
-                    }, 1500);
+            // به‌روزرسانی تعداد پروکسی‌ها در فیلترها
+            function updateFilterCounts() {
+                const counts = {
+                    'all': proxies.length,
+                    'vless': proxies.filter(p => p.protocol === 'vless').length,
+                    'vmess': proxies.filter(p => p.protocol === 'vmess').length,
+                    'trojan': proxies.filter(p => p.protocol === 'trojan').length,
+                    'shadowsocks': proxies.filter(p => p.protocol === 'shadowsocks').length
+                };
+                
+                protocolBtns.forEach(btn => {
+                    const protocol = btn.dataset.protocol;
+                    const countSpan = btn.querySelector('.proxy-count');
+                    countSpan.textContent = counts[protocol];
                 });
-            }
-            
-            // تجزیه و تحلیل سابسکریپشن
-            function parseSubscription(subscriptionData) {
-                // در اینجا باید محتوای سابسکریپشن تجزیه و تحلیل شود
-                // برای نمایش، از داده‌های نمونه استفاده می‌کنیم
-                return subscriptionData.proxies;
             }
             
             // فیلتر کردن پروکسی‌ها بر اساس پروتکل
@@ -411,7 +539,7 @@
             // نمایش پروکسی‌ها در لیست
             function displayProxies(proxiesToShow) {
                 if (proxiesToShow.length === 0) {
-                    proxyList.innerHTML = '<div class="no-proxies"><i class="fas fa-exclamation-circle"></i><h3>پروکسی‌ای یافت نشد</h3><p>هیچ پروکسی‌ای با فیلتر انتخاب شده وجود ندارد</p></div>';
+                    proxyList.innerHTML = '<div class="no-proxies"><i class="fas fa-exclamation-circle"></i><h3>کانفیگی یافت نشد</h3><p>هیچ کانفیگی با فیلتر انتخاب شده وجود ندارد</p></div>';
                     return;
                 }
                 
@@ -454,7 +582,7 @@
                             </div>
                         </div>
                         <button class="copy-btn" data-link="${proxy.link}">
-                            <i class="fas fa-copy"></i> کپی لینک پروکسی
+                            <i class="fas fa-copy"></i> کپی لینک کانفیگ
                         </button>
                     `;
                     
@@ -466,9 +594,15 @@
                     btn.addEventListener('click', function() {
                         const link = this.getAttribute('data-link');
                         copyToClipboard(link);
+                        
+                        // نمایش افکت کپی موفق
+                        const originalText = this.innerHTML;
                         this.innerHTML = '<i class="fas fa-check"></i> کپی شد!';
+                        this.style.background = 'linear-gradient(to right, #27ae60, #219653)';
+                        
                         setTimeout(() => {
-                            this.innerHTML = '<i class="fas fa-copy"></i> کپی لینک پروکسی';
+                            this.innerHTML = originalText;
+                            this.style.background = 'linear-gradient(to right, #2ecc71, #27ae60)';
                         }, 2000);
                     });
                 });
@@ -493,75 +627,6 @@
                     case 'shadowsocks': return 'ghost';
                     default: return 'question';
                 }
-            }
-            
-            // تولید داده‌های نمونه برای نمایش
-            function generateSampleProxies() {
-                return [
-                    {
-                        name: "سرور پرسرعت آلمان",
-                        protocol: "vless",
-                        server: "de-01.example.com",
-                        port: "443",
-                        country: "آلمان",
-                        ping: "42",
-                        link: "vless://uuid@de-01.example.com:443?encryption=none&security=tls&sni=de-01.example.com&type=ws&path=%2Fpath#Germany"
-                    },
-                    {
-                        name: "سرور پرمیوم آمریکا",
-                        protocol: "vmess",
-                        server: "us-02.example.com",
-                        port: "8443",
-                        country: "آمریکا",
-                        ping: "112",
-                        link: "vmess://eyJhZGQiOiJ1cy0wMi5leGFtcGxlLmNvbSIsImFpZCI6IjAiLCJob3N0IjoiIiwiaWQiOiI4NjJhOTg0Yy0xZWE5LTQ4MjMtYjUxOS1jZmM2M2Y3YjFhMTIiLCJuZXQiOiJ3cyIsInBhdGgiOiIvd3MiLCJwb3J0IjoiODQ0MyIsInBzIjoiVVMiLCJ0bHMiOiJ0bHMiLCJ0eXBlIjoibm9uZSIsInYiOiIyIn0="
-                    },
-                    {
-                        name: "سرور اختصاصی ژاپن",
-                        protocol: "trojan",
-                        server: "jp-03.example.com",
-                        port: "2096",
-                        country: "ژاپن",
-                        ping: "89",
-                        link: "trojan://password@jp-03.example.com:2096?security=tls&sni=jp-03.example.com&type=tcp&headerType=none#Japan"
-                    },
-                    {
-                        name: "سرور اقتصادی کانادا",
-                        protocol: "vless",
-                        server: "ca-04.example.com",
-                        port: "2083",
-                        country: "کانادا",
-                        ping: "132",
-                        link: "vless://uuid@ca-04.example.com:2083?encryption=none&security=tls&sni=ca-04.example.com&type=ws&path=%2Fpath#Canada"
-                    },
-                    {
-                        name: "سرور پایدار فرانسه",
-                        protocol: "shadowsocks",
-                        server: "fr-05.example.com",
-                        port: "8388",
-                        country: "فرانسه",
-                        ping: "56",
-                        link: "ss://YWVzLTI1Ni1nY206cGFzc3dvcmQ@fr-05.example.com:8388#France"
-                    },
-                    {
-                        name: "سرور VIP ترکیه",
-                        protocol: "vmess",
-                        server: "tr-06.example.com",
-                        port: "2053",
-                        country: "ترکیه",
-                        ping: "76",
-                        link: "vmess://eyJhZGQiOiJ0ci0wNi5leGFtcGxlLmNvbSIsImFpZCI6IjAiLCJob3N0IjoiIiwiaWQiOiI4NjJhOTg0Yy0xZWE5LTQ4MjMtYjUxOS1jZmM2M2Y3YjFhMTIiLCJuZXQiOiJ3cyIsInBhdGgiOiIvd3MiLCJwb3J0IjoiODQ0MyIsInBzIjoiVFIiLCJ0bHMiOiJ0bHMiLCJ0eXBlIjoibm9uZSIsInYiOiIyIn0="
-                    },
-                    {
-                        name: "سرور اختصاصی انگلیس",
-                        protocol: "trojan",
-                        server: "uk-07.example.com",
-                        port: "2087",
-                        country: "انگلیس",
-                        ping: "64",
-                        link: "trojan://password@uk-07.example.com:2087?security=tls&sni=uk-07.example.com&type=tcp&headerType=none#UK"
-                    }
-                ];
             }
         });
     </script>
