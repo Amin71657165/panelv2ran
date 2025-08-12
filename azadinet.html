@@ -347,8 +347,8 @@
                 });
             });
             
-            // شبیه‌سازی بارگذاری سابسکریپشن
-            function loadSubscription() {
+            // بارگذاری سابسکریپشن
+            async function loadSubscription() {
                 const url = subscriptionUrl.value.trim();
                 
                 if (!url) {
@@ -360,13 +360,42 @@
                 status.textContent = 'در حال بارگذاری سابسکریپشن...';
                 proxyList.innerHTML = '<div class="no-proxies"><i class="fas fa-spinner fa-spin"></i><h3>در حال بارگذاری پروکسی‌ها</h3></div>';
                 
-                // در واقعیت اینجا باید سابسکریپشن از سرور دریافت شود
-                // ولی برای نمایش، از داده‌های نمونه استفاده می‌کنیم
-                setTimeout(() => {
-                    proxies = generateSampleProxies();
+                try {
+                    // شبیه‌سازی دریافت سابسکریپشن از سرور
+                    const subscriptionData = await fetchSubscription(url);
+                    
+                    // تجزیه و تحلیل سابسکریپشن
+                    proxies = parseSubscription(subscriptionData);
+                    
                     status.textContent = `✅ سابسکریپشن با موفقیت بارگذاری شد | ${proxies.length} پروکسی یافت شد`;
                     filterProxies(currentFilter);
-                }, 1500);
+                } catch (error) {
+                    console.error(error);
+                    status.textContent = `❌ خطا: ${error.message}`;
+                    proxyList.innerHTML = '<div class="no-proxies"><i class="fas fa-exclamation-triangle"></i><h3>خطا در بارگذاری سابسکریپشن</h3><p>لطفاً لینک را بررسی کنید و دوباره امتحان نمایید</p></div>';
+                }
+            }
+            
+            // شبیه‌سازی دریافت سابسکریپشن
+            function fetchSubscription(url) {
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        // در واقعیت اینجا باید سابسکریپشن از سرور دریافت شود
+                        // ولی برای نمایش، از داده‌های نمونه استفاده می‌کنیم
+                        const subscriptionData = {
+                            url: url,
+                            proxies: generateSampleProxies()
+                        };
+                        resolve(subscriptionData);
+                    }, 1500);
+                });
+            }
+            
+            // تجزیه و تحلیل سابسکریپشن
+            function parseSubscription(subscriptionData) {
+                // در اینجا باید محتوای سابسکریپشن تجزیه و تحلیل شود
+                // برای نمایش، از داده‌های نمونه استفاده می‌کنیم
+                return subscriptionData.proxies;
             }
             
             // فیلتر کردن پروکسی‌ها بر اساس پروتکل
