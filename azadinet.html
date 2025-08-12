@@ -112,7 +112,7 @@
             background: rgba(10, 15, 25, 0.9);
         }
         
-        #loadBtn {
+        #loadBtn, #pingAllBtn {
             background: linear-gradient(to right, #3498db, #2980b9);
             color: white;
             border: none;
@@ -125,10 +125,27 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
         
-        #loadBtn:hover {
-            background: linear-gradient(to right, #2980b9, #2573a7);
+        #pingAllBtn {
+            background: linear-gradient(to right, #9b59b6, #8e44ad);
+            margin-left: 10px;
+        }
+        
+        #loadBtn:hover, #pingAllBtn:hover {
             transform: translateY(-2px);
             box-shadow: 0 7px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        #loadBtn:hover {
+            background: linear-gradient(to right, #2980b9, #2573a7);
+        }
+        
+        #pingAllBtn:hover {
+            background: linear-gradient(to right, #8e44ad, #7d3c98);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
         }
         
         .protocol-filters {
@@ -322,13 +339,38 @@
             margin-left: 10px;
         }
         
+        .ping-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-left: 5px;
+        }
+        
+        .ping-good {
+            background-color: #2ecc71;
+        }
+        
+        .ping-medium {
+            background-color: #f39c12;
+        }
+        
+        .ping-bad {
+            background-color: #e74c3c;
+        }
+        
         @media (max-width: 768px) {
             .input-group {
                 flex-direction: column;
             }
             
-            #loadBtn {
+            #loadBtn, #pingAllBtn {
                 padding: 14px;
+                width: 100%;
+            }
+            
+            .button-group {
+                flex-direction: column;
             }
             
             .proxy-details {
@@ -351,9 +393,14 @@
         <div class="input-section">
             <div class="input-group">
                 <input type="url" id="subscriptionUrl" placeholder="https://raw.githubusercontent.com/example/subscription" autocomplete="off" value="https://raw.githubusercontent.com/Mosifree/-FREE2CONFIG/refs/heads/main/Movaghat">
-                <button id="loadBtn">
-                    <i class="fas fa-download"></i> بارگذاری سابسکریپشن
-                </button>
+                <div class="button-group">
+                    <button id="loadBtn">
+                        <i class="fas fa-download"></i> بارگذاری سابسکریپشن
+                    </button>
+                    <button id="pingAllBtn">
+                        <i class="fas fa-network-wired"></i> پینگ همه سرورها
+                    </button>
+                </div>
             </div>
             
             <div class="protocol-filters">
@@ -386,6 +433,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const subscriptionUrl = document.getElementById('subscriptionUrl');
             const loadBtn = document.getElementById('loadBtn');
+            const pingAllBtn = document.getElementById('pingAllBtn');
             const proxyList = document.getElementById('proxyList');
             const status = document.getElementById('status');
             const protocolBtns = document.querySelectorAll('.protocol-btn');
@@ -393,9 +441,13 @@
             
             let proxies = [];
             let currentFilter = 'all';
+            let isPinging = false;
             
             // رویداد کلیک برای دکمه بارگذاری
             loadBtn.addEventListener('click', loadSubscription);
+            
+            // رویداد کلیک برای دکمه پینگ همه
+            pingAllBtn.addEventListener('click', pingAllServers);
             
             // رویداد کلیک برای فیلترهای پروتکل
             protocolBtns.forEach(btn => {
@@ -491,7 +543,8 @@
                             server: server,
                             port: port,
                             country: 'نامشخص',
-                            ping: '---'
+                            ping: '---',
+                            pingStatus: 'unknown'
                         });
                     });
                     
@@ -505,6 +558,80 @@
                     status.textContent = `❌ خطا: ${error.message}`;
                     proxyList.innerHTML = '<div class="no-proxies"><i class="fas fa-exclamation-triangle"></i><h3>خطا در بارگذاری سابسکریپشن</h3><p>لطفاً لینک را بررسی کنید و دوباره امتحان نمایید</p></div>';
                 }
+            }
+            
+            // پینگ همه سرورها
+            async function pingAllServers() {
+                if (isPinging) return;
+                if (proxies.length === 0) {
+                    status.textContent = '⚠️ ابتدا سابسکریپشن را بارگذاری کنید';
+                    return;
+                }
+                
+                isPinging = true;
+                pingAllBtn.disabled = true;
+                pingAllBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> در حال پینگ...';
+                status.textContent = 'در حال پینگ سرورها...';
+                
+                try {
+                    // پینگ هر سرور به ترتیب
+                    for (let i = 0; i < proxies.length; i++) {
+                        const proxy = proxies[i];
+                        status.textContent = `در حال پینگ سرور ${i+1} از ${proxies.length}: ${proxy.name}`;
+                        
+                        try {
+                            const pingTime = await pingServer(proxy.server, proxy.port);
+                            proxy.ping = pingTime + ' ms';
+                            
+                            // تعیین وضعیت پینگ
+                            if (pingTime < 200) {
+                                proxy.pingStatus = 'good';
+                            } else if (pingTime < 500) {
+                                proxy.pingStatus = 'medium';
+                            } else {
+                                proxy.pingStatus = 'bad';
+                            }
+                        } catch (e) {
+                            proxy.ping = 'Timeout';
+                            proxy.pingStatus = 'bad';
+                        }
+                        
+                        // به‌روزرسانی نمایش
+                        filterProxies(currentFilter);
+                    }
+                    
+                    status.textContent = `✅ پینگ ${proxies.length} سرور با موفقیت انجام شد`;
+                } catch (error) {
+                    console.error(error);
+                    status.textContent = `❌ خطا در پینگ سرورها: ${error.message}`;
+                } finally {
+                    isPinging = false;
+                    pingAllBtn.disabled = false;
+                    pingAllBtn.innerHTML = '<i class="fas fa-network-wired"></i> پینگ همه سرورها';
+                }
+            }
+            
+            // تابع پینگ سرور با WebSocket
+            function pingServer(host, port) {
+                return new Promise((resolve, reject) => {
+                    const startTime = Date.now();
+                    const timeout = 3000; // 3 ثانیه تایم‌اوت
+                    const socket = new WebSocket(`wss://${host}:${port}`);
+                    
+                    socket.onopen = () => {
+                        const latency = Date.now() - startTime;
+                        socket.close();
+                        resolve(latency);
+                    };
+                    
+                    socket.onerror = () => {
+                        reject(new Error('اتصال ناموفق'));
+                    };
+                    
+                    setTimeout(() => {
+                        reject(new Error('زمان انتظار به پایان رسید'));
+                    }, timeout);
+                });
             }
             
             // به‌روزرسانی تعداد پروکسی‌ها در فیلترها
@@ -553,6 +680,12 @@
                     else if (proxy.protocol === 'trojan') protocolClass = 'trojan';
                     else if (proxy.protocol === 'shadowsocks') protocolClass = 'shadowsocks';
                     
+                    // تعیین کلاس وضعیت پینگ
+                    let pingClass = '';
+                    if (proxy.pingStatus === 'good') pingClass = 'ping-good';
+                    else if (proxy.pingStatus === 'medium') pingClass = 'ping-medium';
+                    else if (proxy.pingStatus === 'bad') pingClass = 'ping-bad';
+                    
                     card.innerHTML = `
                         <div class="card-header">
                             <div class="proxy-name">${proxy.name}</div>
@@ -576,7 +709,10 @@
                             </div>
                             <div class="detail-item">
                                 <span class="detail-label">پینگ</span>
-                                <span class="detail-value">${proxy.ping} ms</span>
+                                <span class="detail-value">
+                                    ${proxy.ping}
+                                    ${proxy.pingStatus !== 'unknown' ? `<span class="ping-indicator ${pingClass}"></span>` : ''}
+                                </span>
                             </div>
                         </div>
                         <button class="copy-btn" data-link="${proxy.link}">
