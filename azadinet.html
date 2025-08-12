@@ -421,19 +421,17 @@
                 proxyList.innerHTML = '<div class="no-proxies"><i class="fas fa-spinner fa-spin"></i><h3>در حال بارگذاری کانفیگ‌ها</h3></div>';
                 
                 try {
-                    // استفاده از CORS proxy برای دور زدن محدودیت‌های CORS
-                    const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
-                    const response = await fetch(proxyUrl);
+                    // دریافت مستقیم سابسکریپشن
+                    const response = await fetch(url);
                     
                     if (!response.ok) {
                         throw new Error('خطا در دریافت سابسکریپشن: ' + response.status);
                     }
                     
-                    const base64Data = await response.text();
-                    // دیکد base64
-                    const decodedData = atob(base64Data);
+                    const subscriptionData = await response.text();
+                    
                     // تقسیم به خطوط
-                    const lines = decodedData.split('\n').filter(line => line.trim() !== '');
+                    const lines = subscriptionData.split('\n').filter(line => line.trim() !== '');
                     
                     proxies = [];
                     lines.forEach(line => {
