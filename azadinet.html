@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مدیریت پیشرفته کانفیگ‌های پروکسی</title>
+    <title>مدیریت پیشرفته کانفیگ‌های پروکسی - نسخه بهبود یافته</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -145,6 +145,7 @@
             display: flex;
             gap: 10px;
             margin-bottom: 15px;
+            flex-wrap: wrap;
         }
         
         .btn {
@@ -198,6 +199,14 @@
         
         .btn-orange:hover {
             background: linear-gradient(to right, #d35400, #ba4a00);
+        }
+        
+        .btn-teal {
+            background: linear-gradient(to right, #1abc9c, #16a085);
+        }
+        
+        .btn-teal:hover {
+            background: linear-gradient(to right, #16a085, #14967c);
         }
         
         .protocol-filters {
@@ -483,6 +492,37 @@
             transition: width 0.3s;
         }
         
+        .proxy-stats {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(15, 22, 40, 0.7);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #8395a7;
+        }
+        
+        .proxy-checkbox {
+            margin-left: 10px;
+            transform: scale(1.2);
+        }
+        
         @media (max-width: 768px) {
             .input-group, .button-group {
                 flex-direction: column;
@@ -508,6 +548,11 @@
             
             .location-row {
                 flex-direction: column;
+            }
+            
+            .stat-item {
+                flex: 1;
+                min-width: 100px;
             }
         }
     </style>
@@ -605,6 +650,9 @@
                 <button id="checkLocationsBtn" class="btn btn-orange">
                     <i class="fas fa-globe-asia"></i> بررسی لوکیشن همه
                 </button>
+                <button id="refreshLocationsBtn" class="btn btn-teal">
+                    <i class="fas fa-sync-alt"></i> بروزرسانی لوکیشن‌ها
+                </button>
             </div>
             
             <div class="button-group">
@@ -615,6 +663,26 @@
             
             <div class="progress-container" id="locationProgressContainer" style="display: none;">
                 <div class="progress-bar" id="locationProgressBar"></div>
+            </div>
+        </div>
+        
+        <!-- آمار پروکسی‌ها -->
+        <div class="proxy-stats" id="proxyStats" style="display: none;">
+            <div class="stat-item">
+                <div class="stat-value" id="totalCount">0</div>
+                <div class="stat-label">کل کانفیگ‌ها</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="activeCount">0</div>
+                <div class="stat-label">کانفیگ‌های فعال</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="selectedCount">0</div>
+                <div class="stat-label">انتخاب شده</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="locationCount">0</div>
+                <div class="stat-label">لوکیشن شناسایی شده</div>
             </div>
         </div>
         
@@ -632,7 +700,7 @@
         </div>
         
         <footer>
-            <p>ساخته شده با ❤️ | تمام پردازش‌ها در مرورگر شما انجام می‌شود | نسخه 3.1</p>
+            <p>ساخته شده با ❤️ | تمام پردازش‌ها در مرورگر شما انجام می‌شود | نسخه 4.0</p>
         </footer>
     </div>
 
@@ -656,8 +724,14 @@
             const copySelectedBtn = document.getElementById('copySelectedBtn');
             const clearAllBtn = document.getElementById('clearAllBtn');
             const checkLocationsBtn = document.getElementById('checkLocationsBtn');
+            const refreshLocationsBtn = document.getElementById('refreshLocationsBtn');
             const locationProgressBar = document.getElementById('locationProgressBar');
             const locationProgressContainer = document.getElementById('locationProgressContainer');
+            const proxyStats = document.getElementById('proxyStats');
+            const totalCount = document.getElementById('totalCount');
+            const activeCount = document.getElementById('activeCount');
+            const selectedCount = document.getElementById('selectedCount');
+            const locationCount = document.getElementById('locationCount');
             
             // متغیرهای حالت
             let proxies = [];
@@ -666,6 +740,8 @@
             let isCheckingLocations = false;
             let pingMethod = 'http';
             let ipInfoCache = {}; // کش برای ذخیره اطلاعات لوکیشن
+            let requestQueue = []; // صف درخواست‌ها
+            const MAX_CONCURRENT_REQUESTS = 3; // حداکثر درخواست همزمان
             
             // رویدادهای تب‌ها
             tabBtns.forEach(btn => {
@@ -729,6 +805,9 @@
             
             // رویداد کلیک برای بررسی لوکیشن همه
             checkLocationsBtn.addEventListener('click', checkAllLocations);
+            
+            // رویداد کلیک برای بروزرسانی لوکیشن‌ها
+            refreshLocationsBtn.addEventListener('click', refreshAllLocations);
             
             // بارگذاری سابسکریپشن
             async function loadSubscription() {
@@ -819,13 +898,6 @@
                         // استخراج اطلاعات سرور و پورت
                         let server = 'نامشخص';
                         let port = 'نامشخص';
-                        let ipInfo = {
-                            country: 'در حال تشخیص...',
-                            city: 'در حال تشخیص...',
-                            region: 'در حال تشخیص...',
-                            isp: 'در حال تشخیص...',
-                            countryCode: ''
-                        };
                         
                         try {
                             if (protocol === 'vmess') {
@@ -845,11 +917,6 @@
                                 server = urlObj.hostname;
                                 port = urlObj.port || (urlObj.protocol === 'https:' ? '443' : '80');
                             }
-                            
-                            // تشخیص کشور با استفاده از سرویس ipapi.co
-                            if (server !== 'نامشخص') {
-                                ipInfo = await getIpInfo(server);
-                            }
                         } catch (e) {
                             console.error('خطا در تجزیه کانفیگ:', e);
                         }
@@ -861,7 +928,13 @@
                             link: configLine,
                             server: server,
                             port: port,
-                            ipInfo: ipInfo,
+                            ipInfo: {
+                                country: 'بررسی نشده',
+                                city: '',
+                                region: '',
+                                isp: '',
+                                countryCode: ''
+                            },
                             ping: '---',
                             pingStatus: 'unknown',
                             selected: false
@@ -877,6 +950,9 @@
                 
                 // نمایش پروکسی‌ها
                 filterProxies(currentFilter);
+                
+                // نمایش آمار
+                updateStats();
             }
             
             // تشخیص اطلاعات IP با استفاده از سرویس ipapi.co
@@ -885,9 +961,9 @@
                 if (!ipOrDomain || ipOrDomain === 'نامشخص') {
                     return { 
                         country: 'نامشخص', 
-                        city: 'نامشخص',
-                        region: 'نامشخص',
-                        isp: 'نامشخص',
+                        city: '',
+                        region: '',
+                        isp: '',
                         countryCode: ''
                     };
                 }
@@ -906,17 +982,17 @@
                         console.error('خطا در دریافت اطلاعات لوکیشن:', data.reason);
                         return { 
                             country: 'نامشخص', 
-                            city: 'نامشخص',
-                            region: 'نامشخص',
-                            isp: 'نامشخص',
+                            city: '',
+                            region: '',
+                            isp: '',
                             countryCode: ''
                         };
                     }
                     
                     const result = {
                         country: data.country_name || 'نامشخص',
-                        city: data.city || 'نامشخص',
-                        region: data.region || 'نامشخص',
+                        city: data.city || '',
+                        region: data.region || '',
                         isp: data.org || 'نامشخص',
                         countryCode: data.country_code ? data.country_code.toLowerCase() : ''
                     };
@@ -928,9 +1004,9 @@
                     console.error('خطا در دریافت اطلاعات IP:', error);
                     return { 
                         country: 'نامشخص', 
-                        city: 'نامشخص',
-                        region: 'نامشخص',
-                        isp: 'نامشخص',
+                        city: '',
+                        region: '',
+                        isp: '',
                         countryCode: ''
                     };
                 }
@@ -1014,30 +1090,43 @@
                 showLoading(`در حال بررسی لوکیشن ${proxies.length} سرور...`);
                 
                 try {
-                    // بررسی لوکیشن هر سرور به ترتیب
+                    // ایجاد صف درخواست‌ها
+                    requestQueue = [];
+                    const serversToCheck = proxies.map(proxy => proxy.server);
+                    
+                    // ایجاد درخواست‌ها
+                    for (const server of serversToCheck) {
+                        if (server && server !== 'نامشخص') {
+                            requestQueue.push(() => getIpInfo(server));
+                        }
+                    }
+                    
+                    // اجرای درخواست‌ها با محدودیت همزمان
+                    const results = await processQueue(requestQueue, MAX_CONCURRENT_REQUESTS);
+                    
+                    // بروزرسانی اطلاعات لوکیشن
                     for (let i = 0; i < proxies.length; i++) {
-                        const proxy = proxies[i];
-                        status.textContent = `در حال بررسی لوکیشن سرور ${i+1} از ${proxies.length}: ${proxy.name}`;
-                        
-                        try {
-                            // حذف از کش برای دریافت اطلاعات جدید
-                            delete ipInfoCache[proxy.server];
-                            
-                            // دریافت اطلاعات لوکیشن جدید
-                            proxy.ipInfo = await getIpInfo(proxy.server);
-                        } catch (e) {
-                            console.error('خطا در بررسی لوکیشن:', e);
+                        if (proxies[i].server && proxies[i].server !== 'نامشخص') {
+                            proxies[i].ipInfo = results[proxies[i].server] || {
+                                country: 'نامشخص',
+                                city: '',
+                                region: '',
+                                isp: '',
+                                countryCode: ''
+                            };
                         }
                         
                         // به‌روزرسانی نوار پیشرفت
                         const progress = Math.round(((i + 1) / proxies.length) * 100);
                         locationProgressBar.style.width = `${progress}%`;
+                        status.textContent = `در حال بررسی لوکیشن ${i+1} از ${proxies.length}: ${proxies[i].name}`;
                         
                         // به‌روزرسانی نمایش
                         filterProxies(currentFilter);
                     }
                     
                     showSuccess(`بررسی لوکیشن ${proxies.length} سرور با موفقیت انجام شد`);
+                    updateStats();
                 } catch (error) {
                     console.error(error);
                     showError(`خطا در بررسی لوکیشن: ${error.message}`);
@@ -1048,6 +1137,46 @@
                         locationProgressContainer.style.display = 'none';
                     }, 2000);
                 }
+            }
+            
+            // بروزرسانی لوکیشن همه سرورها
+            async function refreshAllLocations() {
+                // حذف کش لوکیشن‌ها
+                ipInfoCache = {};
+                
+                // اجرای مجدد بررسی لوکیشن
+                await checkAllLocations();
+            }
+            
+            // پردازش صف درخواست‌ها با محدودیت همزمان
+            async function processQueue(queue, maxConcurrent) {
+                const results = {};
+                let index = 0;
+                
+                async function runNext() {
+                    if (index >= queue.length) return;
+                    
+                    const currentIndex = index++;
+                    const task = queue[currentIndex];
+                    
+                    try {
+                        const result = await task();
+                        results[result.server] = result;
+                    } catch (error) {
+                        console.error(`خطا در پردازش درخواست: ${error}`);
+                    }
+                    
+                    return runNext();
+                }
+                
+                // اجرای همزمان درخواست‌ها
+                const runners = [];
+                for (let i = 0; i < Math.min(maxConcurrent, queue.length); i++) {
+                    runners.push(runNext());
+                }
+                
+                await Promise.all(runners);
+                return results;
             }
             
             // پینگ با روش HTTP
@@ -1124,6 +1253,27 @@
                 });
             }
             
+            // به‌روزرسانی آمار
+            function updateStats() {
+                if (proxies.length > 0) {
+                    proxyStats.style.display = 'flex';
+                    
+                    totalCount.textContent = proxies.length;
+                    activeCount.textContent = proxies.filter(p => p.pingStatus === 'good' || p.pingStatus === 'medium').length;
+                    selectedCount.textContent = proxies.filter(p => p.selected).length;
+                    
+                    const locatedCount = proxies.filter(p => 
+                        p.ipInfo.country && 
+                        p.ipInfo.country !== 'بررسی نشده' && 
+                        p.ipInfo.country !== 'نامشخص'
+                    ).length;
+                    
+                    locationCount.textContent = locatedCount;
+                } else {
+                    proxyStats.style.display = 'none';
+                }
+            }
+            
             // فیلتر کردن پروکسی‌ها بر اساس پروتکل
             function filterProxies(protocol) {
                 if (protocol === 'all') {
@@ -1132,6 +1282,8 @@
                     const filtered = proxies.filter(p => p.protocol === protocol);
                     displayProxies(filtered);
                 }
+                
+                updateStats();
             }
             
             // نمایش پروکسی‌ها در لیست
@@ -1215,6 +1367,7 @@
                     const checkbox = card.querySelector(`#proxy-${index}`);
                     checkbox.addEventListener('change', function() {
                         proxy.selected = this.checked;
+                        updateStats();
                     });
                 });
                 
@@ -1342,7 +1495,8 @@
                 const buttons = [
                     loadBtn, pingAllBtn, parseConfigsBtn, pingConfigsBtn,
                     exportConfigsBtn, copyAllBtn, exportSelectedBtn, 
-                    copySelectedBtn, clearAllBtn, checkLocationsBtn
+                    copySelectedBtn, clearAllBtn, checkLocationsBtn,
+                    refreshLocationsBtn
                 ];
                 
                 buttons.forEach(btn => {
