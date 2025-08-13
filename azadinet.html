@@ -599,7 +599,7 @@
         </div>
         
         <footer>
-            <p>ساخته شده با ❤️ | تمام پردازش‌ها در مرورگر شما انجام می‌شود | نسخه 2.0</p>
+            <p>ساخته شده با ❤️ | تمام پردازش‌ها در مرورگر شما انجام می‌شود | نسخه 3.0</p>
         </footer>
     </div>
 
@@ -781,13 +781,10 @@
                         let port = 'نامشخص';
                         let ipInfo = {
                             country: 'در حال تشخیص...',
-                            countryCode: '',
-                            region: 'در حال تشخیص...',
                             city: 'در حال تشخیص...',
+                            region: 'در حال تشخیص...',
                             isp: 'در حال تشخیص...',
-                            org: 'در حال تشخیص...',
-                            as: 'در حال تشخیص...',
-                            query: 'در حال تشخیص...'
+                            countryCode: ''
                         };
                         
                         try {
@@ -809,7 +806,7 @@
                                 port = urlObj.port || (urlObj.protocol === 'https:' ? '443' : '80');
                             }
                             
-                            // تشخیص کشور با استفاده از سرویس ip-api.com
+                            // تشخیص کشور با استفاده از سرویس ipapi.co
                             if (server !== 'نامشخص') {
                                 ipInfo = await getIpInfo(server);
                             }
@@ -842,19 +839,16 @@
                 filterProxies(currentFilter);
             }
             
-            // تشخیص اطلاعات IP با استفاده از سرویس ip-api.com
+            // تشخیص اطلاعات IP با استفاده از سرویس ipapi.co
             async function getIpInfo(ipOrDomain) {
                 // اگر مقدار IP یا دامنه معتبر نیست
                 if (!ipOrDomain || ipOrDomain === 'نامشخص') {
                     return { 
                         country: 'نامشخص', 
-                        countryCode: '',
-                        region: 'نامشخص',
                         city: 'نامشخص',
+                        region: 'نامشخص',
                         isp: 'نامشخص',
-                        org: 'نامشخص',
-                        as: 'نامشخص',
-                        query: ipOrDomain || 'نامشخص'
+                        countryCode: ''
                     };
                 }
 
@@ -864,49 +858,40 @@
                 }
 
                 try {
-                    // استفاده از سرویس ip-api.com (رایگان)
-                    const response = await fetch(`https://ip-api.com/json/${ipOrDomain}?fields=status,message,country,countryCode,regionName,city,isp,org,as,query`);
+                    // استفاده از سرویس ipapi.co (رایگان)
+                    const response = await fetch(`https://ipapi.co/${ipOrDomain}/json/`);
                     const data = await response.json();
                     
-                    if (data.status === 'success') {
-                        const result = {
-                            country: data.country || 'نامشخص',
-                            countryCode: (data.countryCode || '').toLowerCase(),
-                            region: data.regionName || 'نامشخص',
-                            city: data.city || 'نامشخص',
-                            isp: data.isp || 'نامشخص',
-                            org: data.org || 'نامشخص',
-                            as: data.as || 'نامشخص',
-                            query: data.query || ipOrDomain
-                        };
-                        
-                        // ذخیره در کش
-                        ipInfoCache[ipOrDomain] = result;
-                        return result;
-                    } else {
-                        console.error('خطا در دریافت اطلاعات لوکیشن:', data.message);
+                    if (data.error) {
+                        console.error('خطا در دریافت اطلاعات لوکیشن:', data.reason);
                         return { 
                             country: 'نامشخص', 
-                            countryCode: '',
-                            region: 'نامشخص',
                             city: 'نامشخص',
+                            region: 'نامشخص',
                             isp: 'نامشخص',
-                            org: 'نامشخص',
-                            as: 'نامشخص',
-                            query: ipOrDomain
+                            countryCode: ''
                         };
                     }
+                    
+                    const result = {
+                        country: data.country_name || 'نامشخص',
+                        city: data.city || 'نامشخص',
+                        region: data.region || 'نامشخص',
+                        isp: data.org || 'نامشخص',
+                        countryCode: data.country_code ? data.country_code.toLowerCase() : ''
+                    };
+                    
+                    // ذخیره در کش
+                    ipInfoCache[ipOrDomain] = result;
+                    return result;
                 } catch (error) {
                     console.error('خطا در دریافت اطلاعات IP:', error);
                     return { 
                         country: 'نامشخص', 
-                        countryCode: '',
-                        region: 'نامشخص',
                         city: 'نامشخص',
+                        region: 'نامشخص',
                         isp: 'نامشخص',
-                        org: 'نامشخص',
-                        as: 'نامشخص',
-                        query: ipOrDomain
+                        countryCode: ''
                     };
                 }
             }
@@ -1088,32 +1073,6 @@
                         `<img src="https://flagcdn.com/16x12/${proxy.ipInfo.countryCode}.png" class="flag-icon" alt="${proxy.ipInfo.country}">` : 
                         '';
                     
-                    // HTML جزئیات لوکیشن
-                    const locationHtml = `
-                        <div class="location-details">
-                            <div class="location-row">
-                                <span class="location-label">IP/دامنه:</span>
-                                <span class="location-value">${proxy.ipInfo.query}</span>
-                            </div>
-                            <div class="location-row">
-                                <span class="location-label">موقعیت:</span>
-                                <span class="location-value">${proxy.ipInfo.city}, ${proxy.ipInfo.region}, ${proxy.ipInfo.country}</span>
-                            </div>
-                            <div class="location-row">
-                                <span class="location-label">ارائه دهنده:</span>
-                                <span class="location-value">${proxy.ipInfo.isp}</span>
-                            </div>
-                            <div class="location-row">
-                                <span class="location-label">سازمان:</span>
-                                <span class="location-value">${proxy.ipInfo.org}</span>
-                            </div>
-                            <div class="location-row">
-                                <span class="location-label">AS:</span>
-                                <span class="location-value">${proxy.ipInfo.as}</span>
-                            </div>
-                        </div>
-                    `;
-                    
                     card.innerHTML = `
                         <div class="card-header">
                             <div class="proxy-name">
@@ -1139,6 +1098,14 @@
                                 <span class="detail-value">${proxy.ipInfo.country} ${flagHtml}</span>
                             </div>
                             <div class="detail-item">
+                                <span class="detail-label">شهر/استان</span>
+                                <span class="detail-value">${proxy.ipInfo.city}, ${proxy.ipInfo.region}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">ارائه دهنده</span>
+                                <span class="detail-value">${proxy.ipInfo.isp}</span>
+                            </div>
+                            <div class="detail-item">
                                 <span class="detail-label">پینگ</span>
                                 <span class="detail-value">
                                     ${proxy.ping}
@@ -1146,7 +1113,6 @@
                                 </span>
                             </div>
                         </div>
-                        ${locationHtml}
                         <button class="copy-btn" data-link="${proxy.link}">
                             <i class="fas fa-copy"></i> کپی لینک کانفیگ
                         </button>
