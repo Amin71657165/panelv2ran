@@ -192,6 +192,14 @@
             background: linear-gradient(to right, #8e44ad, #7d3c98);
         }
         
+        .btn-orange {
+            background: linear-gradient(to right, #e67e22, #d35400);
+        }
+        
+        .btn-orange:hover {
+            background: linear-gradient(to right, #d35400, #ba4a00);
+        }
+        
         .protocol-filters {
             display: flex;
             flex-wrap: wrap;
@@ -460,6 +468,21 @@
             font-weight: 500;
         }
         
+        .progress-container {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(to right, #3498db, #2ecc71);
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+        
         @media (max-width: 768px) {
             .input-group, .button-group {
                 flex-direction: column;
@@ -579,9 +602,19 @@
             </div>
             
             <div class="button-group">
+                <button id="checkLocationsBtn" class="btn btn-orange">
+                    <i class="fas fa-globe-asia"></i> بررسی لوکیشن همه
+                </button>
+            </div>
+            
+            <div class="button-group">
                 <button id="clearAllBtn" class="btn">
                     <i class="fas fa-trash"></i> پاک کردن همه
                 </button>
+            </div>
+            
+            <div class="progress-container" id="locationProgressContainer" style="display: none;">
+                <div class="progress-bar" id="locationProgressBar"></div>
             </div>
         </div>
         
@@ -599,7 +632,7 @@
         </div>
         
         <footer>
-            <p>ساخته شده با ❤️ | تمام پردازش‌ها در مرورگر شما انجام می‌شود | نسخه 3.0</p>
+            <p>ساخته شده با ❤️ | تمام پردازش‌ها در مرورگر شما انجام می‌شود | نسخه 3.1</p>
         </footer>
     </div>
 
@@ -622,11 +655,15 @@
             const exportSelectedBtn = document.getElementById('exportSelectedBtn');
             const copySelectedBtn = document.getElementById('copySelectedBtn');
             const clearAllBtn = document.getElementById('clearAllBtn');
+            const checkLocationsBtn = document.getElementById('checkLocationsBtn');
+            const locationProgressBar = document.getElementById('locationProgressBar');
+            const locationProgressContainer = document.getElementById('locationProgressContainer');
             
             // متغیرهای حالت
             let proxies = [];
             let currentFilter = 'all';
             let isPinging = false;
+            let isCheckingLocations = false;
             let pingMethod = 'http';
             let ipInfoCache = {}; // کش برای ذخیره اطلاعات لوکیشن
             
@@ -689,6 +726,9 @@
             
             // رویداد کلیک برای پاک کردن همه
             clearAllBtn.addEventListener('click', clearAllConfigs);
+            
+            // رویداد کلیک برای بررسی لوکیشن همه
+            checkLocationsBtn.addEventListener('click', checkAllLocations);
             
             // بارگذاری سابسکریپشن
             async function loadSubscription() {
@@ -956,6 +996,57 @@
                 } finally {
                     isPinging = false;
                     disableButtons(false);
+                }
+            }
+            
+            // بررسی لوکیشن همه سرورها
+            async function checkAllLocations() {
+                if (isCheckingLocations) return;
+                if (proxies.length === 0) {
+                    showError('ابتدا کانفیگ‌ها را بارگذاری کنید');
+                    return;
+                }
+                
+                isCheckingLocations = true;
+                disableButtons(true);
+                locationProgressContainer.style.display = 'block';
+                locationProgressBar.style.width = '0%';
+                showLoading(`در حال بررسی لوکیشن ${proxies.length} سرور...`);
+                
+                try {
+                    // بررسی لوکیشن هر سرور به ترتیب
+                    for (let i = 0; i < proxies.length; i++) {
+                        const proxy = proxies[i];
+                        status.textContent = `در حال بررسی لوکیشن سرور ${i+1} از ${proxies.length}: ${proxy.name}`;
+                        
+                        try {
+                            // حذف از کش برای دریافت اطلاعات جدید
+                            delete ipInfoCache[proxy.server];
+                            
+                            // دریافت اطلاعات لوکیشن جدید
+                            proxy.ipInfo = await getIpInfo(proxy.server);
+                        } catch (e) {
+                            console.error('خطا در بررسی لوکیشن:', e);
+                        }
+                        
+                        // به‌روزرسانی نوار پیشرفت
+                        const progress = Math.round(((i + 1) / proxies.length) * 100);
+                        locationProgressBar.style.width = `${progress}%`;
+                        
+                        // به‌روزرسانی نمایش
+                        filterProxies(currentFilter);
+                    }
+                    
+                    showSuccess(`بررسی لوکیشن ${proxies.length} سرور با موفقیت انجام شد`);
+                } catch (error) {
+                    console.error(error);
+                    showError(`خطا در بررسی لوکیشن: ${error.message}`);
+                } finally {
+                    isCheckingLocations = false;
+                    disableButtons(false);
+                    setTimeout(() => {
+                        locationProgressContainer.style.display = 'none';
+                    }, 2000);
                 }
             }
             
@@ -1250,7 +1341,8 @@
             function disableButtons(disabled) {
                 const buttons = [
                     loadBtn, pingAllBtn, parseConfigsBtn, pingConfigsBtn,
-                    exportConfigsBtn, copyAllBtn, exportSelectedBtn, copySelectedBtn, clearAllBtn
+                    exportConfigsBtn, copyAllBtn, exportSelectedBtn, 
+                    copySelectedBtn, clearAllBtn, checkLocationsBtn
                 ];
                 
                 buttons.forEach(btn => {
