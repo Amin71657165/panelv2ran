@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مدیریت سابسکریپشن پروکسی</title>
+    <title>مدیریت کانفیگ‌های پروکسی</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -25,7 +25,7 @@
         
         .container {
             width: 100%;
-            max-width: 1000px;
+            max-width: 1200px;
             background: rgba(25, 32, 45, 0.9);
             border-radius: 15px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
@@ -79,9 +79,36 @@
             z-index: 2;
         }
         
-        .input-section {
-            padding: 30px;
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .tab-btn {
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            transition: all 0.3s;
+        }
+        
+        .tab-btn.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+            background: rgba(52, 152, 219, 0.1);
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+        }
+        
+        .tab-content.active {
+            display: block;
         }
         
         .input-group {
@@ -90,7 +117,7 @@
             margin-bottom: 15px;
         }
         
-        #subscriptionUrl {
+        #subscriptionUrl, .config-textarea {
             flex: 1;
             padding: 14px 20px;
             background: rgba(10, 15, 25, 0.7);
@@ -101,56 +128,75 @@
             color: white;
         }
         
-        #subscriptionUrl::placeholder {
-            color: rgba(255, 255, 255, 0.5);
+        .config-textarea {
+            width: 100%;
+            min-height: 150px;
+            font-family: monospace;
+            margin-bottom: 15px;
         }
         
-        #subscriptionUrl:focus {
+        #subscriptionUrl:focus, .config-textarea:focus {
             border-color: #3498db;
             outline: none;
             box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-            background: rgba(10, 15, 25, 0.9);
         }
         
         .button-group {
             display: flex;
             gap: 10px;
+            margin-bottom: 15px;
         }
         
-        #loadBtn, #pingAllBtn {
+        .btn {
             background: linear-gradient(to right, #3498db, #2980b9);
             color: white;
             border: none;
             border-radius: 8px;
-            padding: 0 30px;
+            padding: 12px 25px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
-        #pingAllBtn {
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #3498db, #2980b9);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(to right, #2980b9, #2573a7);
+        }
+        
+        .btn-success {
+            background: linear-gradient(to right, #2ecc71, #27ae60);
+        }
+        
+        .btn-success:hover {
+            background: linear-gradient(to right, #27ae60, #219653);
+        }
+        
+        .btn-purple {
             background: linear-gradient(to right, #9b59b6, #8e44ad);
         }
         
-        #loadBtn:hover {
-            background: linear-gradient(to right, #2980b9, #2573a7);
-            transform: translateY(-2px);
-            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.3);
-        }
-        
-        #pingAllBtn:hover {
+        .btn-purple:hover {
             background: linear-gradient(to right, #8e44ad, #7d3c98);
-            transform: translateY(-2px);
-            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.3);
         }
         
         .protocol-filters {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
-            margin-top: 20px;
+            margin: 15px 0;
             justify-content: center;
         }
         
@@ -177,9 +223,9 @@
         }
         
         .proxy-list {
-            padding: 20px;
             max-height: 500px;
             overflow-y: auto;
+            margin-top: 20px;
         }
         
         .proxy-card {
@@ -360,7 +406,7 @@
         .ping-options {
             display: flex;
             gap: 10px;
-            margin-top: 15px;
+            margin: 15px 0;
             justify-content: center;
         }
         
@@ -382,18 +428,22 @@
             border-color: #3498db;
         }
         
+        .flag-icon {
+            width: 20px;
+            height: 15px;
+            margin-left: 5px;
+            vertical-align: middle;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
         @media (max-width: 768px) {
-            .input-group {
+            .input-group, .button-group {
                 flex-direction: column;
             }
             
-            .button-group {
-                flex-direction: column;
-            }
-            
-            #loadBtn, #pingAllBtn {
-                padding: 14px;
+            .btn {
                 width: 100%;
+                justify-content: center;
             }
             
             .proxy-details {
@@ -403,27 +453,66 @@
             header h1 {
                 font-size: 1.8rem;
             }
+            
+            .tab-buttons {
+                overflow-x: auto;
+                white-space: nowrap;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-server"></i> مدیریت سابسکریپشن پروکسی</h1>
-            <p class="subtitle">لینک سابسکریپشن خود را وارد کنید تا تمامی کانفیگ‌ها استخراج و نمایش داده شوند. هر کانفیگ را می‌توانید با یک کلیک کپی کنید.</p>
+            <h1><i class="fas fa-server"></i> مدیریت پیشرفته کانفیگ‌های پروکسی</h1>
+            <p class="subtitle">بارگذاری از سابسکریپشن یا وارد کردن مستقیم کانفیگ‌ها | تشخیص لوکیشن و پینگ واقعی</p>
         </header>
         
-        <div class="input-section">
+        <div class="tab-buttons">
+            <button class="tab-btn active" data-tab="subscription-tab"><i class="fas fa-link"></i> سابسکریپشن</button>
+            <button class="tab-btn" data-tab="configs-tab"><i class="fas fa-code"></i> کانفیگ مستقیم</button>
+            <button class="tab-btn" data-tab="batch-tab"><i class="fas fa-paste"></i> گروهی</button>
+        </div>
+        
+        <!-- تب سابسکریپشن -->
+        <div class="tab-content active" id="subscription-tab">
             <div class="input-group">
-                <input type="url" id="subscriptionUrl" placeholder="https://raw.githubusercontent.com/example/subscription" autocomplete="off" value="https://raw.githubusercontent.com/Mosifree/-FREE2CONFIG/refs/heads/main/Movaghat">
-                <div class="button-group">
-                    <button id="loadBtn">
-                        <i class="fas fa-download"></i> بارگذاری سابسکریپشن
-                    </button>
-                    <button id="pingAllBtn">
-                        <i class="fas fa-network-wired"></i> پینگ همه سرورها
-                    </button>
-                </div>
+                <input type="url" id="subscriptionUrl" placeholder="https://example.com/subscription/link" autocomplete="off" value="https://raw.githubusercontent.com/Mosifree/-FREE2CONFIG/refs/heads/main/Movaghat">
+                <button id="loadBtn" class="btn btn-primary">
+                    <i class="fas fa-download"></i> بارگذاری
+                </button>
+            </div>
+            
+            <div class="ping-options">
+                <div class="ping-option-btn active" data-method="http">پینگ HTTP</div>
+                <div class="ping-option-btn" data-method="tcp">پینگ TCP</div>
+                <div class="ping-option-btn" data-method="mixed">پینگ ترکیبی</div>
+            </div>
+            
+            <div class="protocol-filters">
+                <div class="protocol-btn active" data-protocol="all">همه <span class="proxy-count">0</span></div>
+                <div class="protocol-btn" data-protocol="vless">Vless <span class="proxy-count">0</span></div>
+                <div class="protocol-btn" data-protocol="vmess">VMess <span class="proxy-count">0</span></div>
+                <div class="protocol-btn" data-protocol="trojan">Trojan <span class="proxy-count">0</span></div>
+                <div class="protocol-btn" data-protocol="shadowsocks">Shadowsocks <span class="proxy-count">0</span></div>
+            </div>
+            
+            <button id="pingAllBtn" class="btn btn-purple">
+                <i class="fas fa-network-wired"></i> پینگ همه سرورها
+            </button>
+        </div>
+        
+        <!-- تب کانفیگ مستقیم -->
+        <div class="tab-content" id="configs-tab">
+            <textarea class="config-textarea" id="configTextarea" placeholder="کانفیگ‌های خود را اینجا قرار دهید (هر خط یک کانفیگ)"></textarea>
+            
+            <div class="button-group">
+                <button id="parseConfigsBtn" class="btn btn-primary">
+                    <i class="fas fa-code"></i> تجزیه کانفیگ‌ها
+                </button>
+                <button id="pingConfigsBtn" class="btn btn-purple">
+                    <i class="fas fa-network-wired"></i> پینگ همه
+                </button>
             </div>
             
             <div class="ping-options">
@@ -441,25 +530,54 @@
             </div>
         </div>
         
+        <!-- تب گروهی -->
+        <div class="tab-content" id="batch-tab">
+            <div class="button-group">
+                <button id="exportConfigsBtn" class="btn btn-success">
+                    <i class="fas fa-file-export"></i> خروجی همه کانفیگ‌ها
+                </button>
+                <button id="copyAllBtn" class="btn btn-primary">
+                    <i class="fas fa-copy"></i> کپی همه
+                </button>
+            </div>
+            
+            <div class="button-group">
+                <button id="exportSelectedBtn" class="btn btn-success">
+                    <i class="fas fa-file-export"></i> خروجی انتخاب شده‌ها
+                </button>
+                <button id="copySelectedBtn" class="btn btn-primary">
+                    <i class="fas fa-copy"></i> کپی انتخاب شده‌ها
+                </button>
+            </div>
+            
+            <div class="button-group">
+                <button id="clearAllBtn" class="btn">
+                    <i class="fas fa-trash"></i> پاک کردن همه
+                </button>
+            </div>
+        </div>
+        
+        <!-- لیست پروکسی‌ها -->
         <div class="proxy-list" id="proxyList">
             <div class="no-proxies">
                 <i class="fas fa-cloud-download-alt"></i>
                 <h3>هنوز کانفیگی بارگذاری نشده است</h3>
-                <p>لطفاً لینک سابسکریپشن خود را وارد کرده و دکمه بارگذاری را بزنید</p>
+                <p>لطفاً لینک سابسکریپشن را وارد کنید یا کانفیگ‌ها را مستقیماً paste کنید</p>
             </div>
         </div>
         
         <div class="status" id="status">
-            آماده برای بارگذاری سابسکریپشن
+            آماده برای بارگذاری کانفیگ‌ها
         </div>
         
         <footer>
-            <p>ساخته شده با ❤️ | اطلاعات سابسکریپشن مستقیماً از لینک شما دریافت می‌شود و به سرور ارسال نمی‌شود</p>
+            <p>ساخته شده با ❤️ | تمام پردازش‌ها در مرورگر شما انجام می‌شود | نسخه 2.0</p>
         </footer>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // عناصر DOM
             const subscriptionUrl = document.getElementById('subscriptionUrl');
             const loadBtn = document.getElementById('loadBtn');
             const pingAllBtn = document.getElementById('pingAllBtn');
@@ -467,14 +585,37 @@
             const status = document.getElementById('status');
             const protocolBtns = document.querySelectorAll('.protocol-btn');
             const pingOptionBtns = document.querySelectorAll('.ping-option-btn');
-            const proxyCounts = document.querySelectorAll('.proxy-count');
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const configTextarea = document.getElementById('configTextarea');
+            const parseConfigsBtn = document.getElementById('parseConfigsBtn');
+            const pingConfigsBtn = document.getElementById('pingConfigsBtn');
+            const exportConfigsBtn = document.getElementById('exportConfigsBtn');
+            const copyAllBtn = document.getElementById('copyAllBtn');
+            const exportSelectedBtn = document.getElementById('exportSelectedBtn');
+            const copySelectedBtn = document.getElementById('copySelectedBtn');
+            const clearAllBtn = document.getElementById('clearAllBtn');
             
+            // متغیرهای حالت
             let proxies = [];
             let currentFilter = 'all';
             let isPinging = false;
             let pingMethod = 'http';
             
-            // رویداد کلیک برای دکمه بارگذاری
+            // رویدادهای تب‌ها
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const tabId = this.getAttribute('data-tab');
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // رویداد کلیک برای دکمه بارگذاری سابسکریپشن
             loadBtn.addEventListener('click', loadSubscription);
             
             // رویداد کلیک برای دکمه پینگ همه
@@ -499,69 +640,123 @@
                 });
             });
             
+            // رویداد کلیک برای تجزیه کانفیگ‌های مستقیم
+            parseConfigsBtn.addEventListener('click', parseDirectConfigs);
+            
+            // رویداد کلیک برای پینگ کانفیگ‌های مستقیم
+            pingConfigsBtn.addEventListener('click', pingAllServers);
+            
+            // رویداد کلیک برای خروجی همه کانفیگ‌ها
+            exportConfigsBtn.addEventListener('click', exportAllConfigs);
+            
+            // رویداد کلیک برای کپی همه کانفیگ‌ها
+            copyAllBtn.addEventListener('click', copyAllConfigs);
+            
+            // رویداد کلیک برای خروجی انتخاب شده‌ها
+            exportSelectedBtn.addEventListener('click', exportSelectedConfigs);
+            
+            // رویداد کلیک برای کپی انتخاب شده‌ها
+            copySelectedBtn.addEventListener('click', copySelectedConfigs);
+            
+            // رویداد کلیک برای پاک کردن همه
+            clearAllBtn.addEventListener('click', clearAllConfigs);
+            
             // بارگذاری سابسکریپشن
             async function loadSubscription() {
                 const url = subscriptionUrl.value.trim();
                 
                 if (!url) {
-                    status.textContent = '⚠️ لطفاً لینک سابسکریپشن را وارد کنید';
+                    showError('لطفاً لینک سابسکریپشن را وارد کنید');
                     subscriptionUrl.focus();
                     return;
                 }
                 
-                status.textContent = 'در حال بارگذاری سابسکریپشن...';
-                proxyList.innerHTML = '<div class="no-proxies"><i class="fas fa-spinner fa-spin"></i><h3>در حال بارگذاری کانفیگ‌ها</h3></div>';
+                showLoading('در حال بارگذاری سابسکریپشن...');
                 
                 try {
-                    // دریافت مستقیم سابسکریپشن
-                    const response = await fetch(url);
+                    // دریافت سابسکریپشن با استفاده از CORS proxy
+                    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+                    const response = await fetch(proxyUrl);
                     
                     if (!response.ok) {
-                        throw new Error('خطا در دریافت سابسکریپشن: ' + response.status);
+                        throw new Error(`خطا در دریافت سابسکریپشن: ${response.status}`);
                     }
                     
                     const subscriptionData = await response.text();
+                    await parseConfigs(subscriptionData);
                     
-                    // تقسیم به خطوط
-                    const lines = subscriptionData.split('\n').filter(line => line.trim() !== '');
-                    
-                    proxies = [];
-                    lines.forEach(line => {
-                        line = line.trim();
+                    showSuccess(`سابسکریپشن با موفقیت بارگذاری شد | ${proxies.length} کانفیگ یافت شد`);
+                } catch (error) {
+                    console.error(error);
+                    showError(`خطا در بارگذاری سابسکریپشن: ${error.message}`);
+                }
+            }
+            
+            // تجزیه کانفیگ‌های مستقیم
+            function parseDirectConfigs() {
+                const configs = configTextarea.value.trim();
+                
+                if (!configs) {
+                    showError('لطفاً کانفیگ‌ها را وارد کنید');
+                    configTextarea.focus();
+                    return;
+                }
+                
+                showLoading('در حال تجزیه کانفیگ‌ها...');
+                
+                try {
+                    parseConfigs(configs);
+                    showSuccess(`${proxies.length} کانفیگ با موفقیت تجزیه شد`);
+                } catch (error) {
+                    console.error(error);
+                    showError(`خطا در تجزیه کانفیگ‌ها: ${error.message}`);
+                }
+            }
+            
+            // تجزیه کانفیگ‌ها (مشترک بین سابسکریپشن و کانفیگ مستقیم)
+            async function parseConfigs(configData) {
+                // تقسیم به خطوط
+                const lines = configData.split('\n').filter(line => line.trim() !== '');
+                
+                proxies = [];
+                
+                for (const line of lines) {
+                    try {
+                        const trimmedLine = line.trim();
+                        if (!trimmedLine) continue;
+                        
                         let name = 'بدون نام';
                         let protocol = 'other';
+                        let configLine = trimmedLine;
                         
                         // استخراج نام از قسمت بعد از #
-                        const hashIndex = line.lastIndexOf('#');
+                        const hashIndex = configLine.lastIndexOf('#');
                         if (hashIndex !== -1) {
-                            name = decodeURIComponent(line.substring(hashIndex + 1));
-                            line = line.substring(0, hashIndex);
+                            name = decodeURIComponent(configLine.substring(hashIndex + 1));
+                            configLine = configLine.substring(0, hashIndex);
                         }
                         
                         // تشخیص پروتکل
-                        if (line.startsWith('vless://')) {
+                        if (configLine.startsWith('vless://')) {
                             protocol = 'vless';
-                        } else if (line.startsWith('vmess://')) {
+                        } else if (configLine.startsWith('vmess://')) {
                             protocol = 'vmess';
-                        } else if (line.startsWith('trojan://')) {
+                        } else if (configLine.startsWith('trojan://')) {
                             protocol = 'trojan';
-                        } else if (line.startsWith('ss://')) {
+                        } else if (configLine.startsWith('ss://')) {
                             protocol = 'shadowsocks';
                         }
                         
                         // استخراج اطلاعات سرور و پورت
                         let server = 'نامشخص';
                         let port = 'نامشخص';
+                        let country = 'نامشخص';
+                        let countryCode = '';
                         
                         try {
-                            // برای پروتکل‌های غیر از vmess
-                            if (protocol !== 'vmess') {
-                                const urlObj = new URL(line);
-                                server = urlObj.hostname;
-                                port = urlObj.port || '443';
-                            } else {
+                            if (protocol === 'vmess') {
                                 // برای vmess
-                                const vmessContent = line.substring(8);
+                                const vmessContent = configLine.substring(8);
                                 const decoded = atob(vmessContent);
                                 const vmessConfig = JSON.parse(decoded);
                                 server = vmessConfig.add;
@@ -570,6 +765,18 @@
                                 if (vmessConfig.ps && name === 'بدون نام') {
                                     name = vmessConfig.ps;
                                 }
+                            } else {
+                                // برای سایر پروتکل‌ها
+                                const urlObj = new URL(configLine);
+                                server = urlObj.hostname;
+                                port = urlObj.port || (urlObj.protocol === 'https:' ? '443' : '80');
+                            }
+                            
+                            // تشخیص کشور
+                            if (server !== 'نامشخص') {
+                                const ipInfo = await getIpInfo(server);
+                                country = ipInfo.country || 'نامشخص';
+                                countryCode = ipInfo.countryCode.toLowerCase() || '';
                             }
                         } catch (e) {
                             console.error('خطا در تجزیه کانفیگ:', e);
@@ -579,39 +786,78 @@
                         proxies.push({
                             name: name,
                             protocol: protocol,
-                            link: line,
+                            link: configLine,
                             server: server,
                             port: port,
-                            country: 'نامشخص',
+                            country: country,
+                            countryCode: countryCode,
                             ping: '---',
-                            pingStatus: 'unknown'
+                            pingStatus: 'unknown',
+                            selected: false
                         });
-                    });
-                    
-                    // به‌روزرسانی تعداد پروکسی‌ها در فیلترها
-                    updateFilterCounts();
-                    
-                    status.textContent = `✅ سابسکریپشن با موفقیت بارگذاری شد | ${proxies.length} کانفیگ یافت شد`;
-                    filterProxies(currentFilter);
-                } catch (error) {
-                    console.error(error);
-                    status.textContent = `❌ خطا: ${error.message}`;
-                    proxyList.innerHTML = '<div class="no-proxies"><i class="fas fa-exclamation-triangle"></i><h3>خطا در بارگذاری سابسکریپشن</h3><p>لطفاً لینک را بررسی کنید و دوباره امتحان نمایید</p></div>';
+                        
+                    } catch (e) {
+                        console.error('خطا در پردازش خط:', line, e);
+                    }
                 }
+                
+                // به‌روزرسانی تعداد پروکسی‌ها در فیلترها
+                updateFilterCounts();
+                
+                // نمایش پروکسی‌ها
+                filterProxies(currentFilter);
+            }
+            
+            // تشخیص اطلاعات IP (شبیه‌سازی شده)
+            async function getIpInfo(ipOrDomain) {
+                // در یک نسخه واقعی، اینجا باید از یک سرویس IP Geolocation استفاده شود
+                // برای نمونه، یک شبیه‌سازی بر اساس دامنه انجام می‌دهیم
+                
+                const domainParts = ipOrDomain.split('.').filter(Boolean);
+                const domainExt = domainParts.length > 1 ? domainParts[domainParts.length - 1] : '';
+                
+                const countryMap = {
+                    'ir': {country: 'ایران', countryCode: 'ir'},
+                    'us': {country: 'آمریکا', countryCode: 'us'},
+                    'de': {country: 'آلمان', countryCode: 'de'},
+                    'fr': {country: 'فرانسه', countryCode: 'fr'},
+                    'jp': {country: 'ژاپن', countryCode: 'jp'},
+                    'ca': {country: 'کانادا', countryCode: 'ca'},
+                    'tr': {country: 'ترکیه', countryCode: 'tr'},
+                    'uk': {country: 'انگلیس', countryCode: 'gb'},
+                    'nl': {country: 'هلند', countryCode: 'nl'},
+                    'sg': {country: 'سنگاپور', countryCode: 'sg'},
+                    'ru': {country: 'روسیه', countryCode: 'ru'},
+                    'ch': {country: 'سوئیس', countryCode: 'ch'},
+                    'se': {country: 'سوئد', countryCode: 'se'},
+                    'fi': {country: 'فنلاند', countryCode: 'fi'},
+                    'au': {country: 'استرالیا', countryCode: 'au'},
+                    'in': {country: 'هند', countryCode: 'in'},
+                    'br': {country: 'برزیل', countryCode: 'br'}
+                };
+                
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        if (domainExt in countryMap) {
+                            resolve(countryMap[domainExt]);
+                        } else {
+                            resolve({country: 'نامشخص', countryCode: ''});
+                        }
+                    }, 50);
+                });
             }
             
             // پینگ همه سرورها
             async function pingAllServers() {
                 if (isPinging) return;
                 if (proxies.length === 0) {
-                    status.textContent = '⚠️ ابتدا سابسکریپشن را بارگذاری کنید';
+                    showError('ابتدا کانفیگ‌ها را بارگذاری کنید');
                     return;
                 }
                 
                 isPinging = true;
-                pingAllBtn.disabled = true;
-                pingAllBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> در حال پینگ...';
-                status.textContent = 'در حال پینگ سرورها...';
+                disableButtons(true);
+                showLoading(`در حال پینگ ${proxies.length} سرور...`);
                 
                 try {
                     // پینگ هر سرور به ترتیب
@@ -654,14 +900,13 @@
                         filterProxies(currentFilter);
                     }
                     
-                    status.textContent = `✅ پینگ ${proxies.length} سرور با موفقیت انجام شد`;
+                    showSuccess(`پینگ ${proxies.length} سرور با موفقیت انجام شد`);
                 } catch (error) {
                     console.error(error);
-                    status.textContent = `❌ خطا در پینگ سرورها: ${error.message}`;
+                    showError(`خطا در پینگ سرورها: ${error.message}`);
                 } finally {
                     isPinging = false;
-                    pingAllBtn.disabled = false;
-                    pingAllBtn.innerHTML = '<i class="fas fa-network-wired"></i> پینگ همه سرورها';
+                    disableButtons(false);
                 }
             }
             
@@ -758,7 +1003,7 @@
                 
                 proxyList.innerHTML = '';
                 
-                proxiesToShow.forEach(proxy => {
+                proxiesToShow.forEach((proxy, index) => {
                     const card = document.createElement('div');
                     card.className = 'proxy-card';
                     
@@ -774,9 +1019,17 @@
                     else if (proxy.pingStatus === 'medium') pingClass = 'ping-medium';
                     else if (proxy.pingStatus === 'bad') pingClass = 'ping-bad';
                     
+                    // نمایش پرچم کشور اگر کد کشور موجود باشد
+                    const flagHtml = proxy.countryCode ? 
+                        `<img src="https://flagcdn.com/16x12/${proxy.countryCode}.png" class="flag-icon" alt="${proxy.country}">` : 
+                        '<i class="fas fa-globe"></i>';
+                    
                     card.innerHTML = `
                         <div class="card-header">
-                            <div class="proxy-name">${proxy.name}</div>
+                            <div class="proxy-name">
+                                <input type="checkbox" id="proxy-${index}" ${proxy.selected ? 'checked' : ''} class="proxy-checkbox">
+                                <label for="proxy-${index}">${proxy.name}</label>
+                            </div>
                             <div class="protocol ${protocolClass}">
                                 <i class="fas fa-${getProtocolIcon(proxy.protocol)}"></i>
                                 ${proxy.protocol.toUpperCase()}
@@ -793,7 +1046,7 @@
                             </div>
                             <div class="detail-item">
                                 <span class="detail-label">کشور</span>
-                                <span class="detail-value">${proxy.country} <i class="fas fa-flag"></i></span>
+                                <span class="detail-value">${proxy.country} ${flagHtml}</span>
                             </div>
                             <div class="detail-item">
                                 <span class="detail-label">پینگ</span>
@@ -809,6 +1062,12 @@
                     `;
                     
                     proxyList.appendChild(card);
+                    
+                    // اضافه کردن رویداد تغییر به چک‌باکس
+                    const checkbox = card.querySelector(`#proxy-${index}`);
+                    checkbox.addEventListener('change', function() {
+                        proxy.selected = this.checked;
+                    });
                 });
                 
                 // اضافه کردن رویداد کپی برای دکمه‌ها
@@ -830,7 +1089,7 @@
                 });
             }
             
-            // تابع کپی به کلیپ‌بورد
+            // کپی به کلیپ‌بورد
             function copyToClipboard(text) {
                 const textarea = document.createElement('textarea');
                 textarea.value = text;
@@ -838,6 +1097,85 @@
                 textarea.select();
                 document.execCommand('copy');
                 document.body.removeChild(textarea);
+            }
+            
+            // خروجی همه کانفیگ‌ها
+            function exportAllConfigs() {
+                if (proxies.length === 0) {
+                    showError('هیچ کانفیگی برای خروجی وجود ندارد');
+                    return;
+                }
+                
+                const allConfigs = proxies.map(p => p.link).join('\n');
+                downloadAsFile(allConfigs, 'all-configs.txt');
+                showSuccess('تمام کانفیگ‌ها با موفقیت دانلود شدند');
+            }
+            
+            // کپی همه کانفیگ‌ها
+            function copyAllConfigs() {
+                if (proxies.length === 0) {
+                    showError('هیچ کانفیگی برای کپی وجود ندارد');
+                    return;
+                }
+                
+                const allConfigs = proxies.map(p => p.link).join('\n');
+                copyToClipboard(allConfigs);
+                showSuccess('تمام کانفیگ‌ها با موفقیت کپی شدند');
+            }
+            
+            // خروجی انتخاب شده‌ها
+            function exportSelectedConfigs() {
+                const selectedConfigs = proxies.filter(p => p.selected).map(p => p.link);
+                
+                if (selectedConfigs.length === 0) {
+                    showError('هیچ کانفیگی انتخاب نشده است');
+                    return;
+                }
+                
+                downloadAsFile(selectedConfigs.join('\n'), 'selected-configs.txt');
+                showSuccess(`${selectedConfigs.length} کانفیگ انتخاب شده با موفقیت دانلود شدند`);
+            }
+            
+            // کپی انتخاب شده‌ها
+            function copySelectedConfigs() {
+                const selectedConfigs = proxies.filter(p => p.selected).map(p => p.link);
+                
+                if (selectedConfigs.length === 0) {
+                    showError('هیچ کانفیگی انتخاب نشده است');
+                    return;
+                }
+                
+                copyToClipboard(selectedConfigs.join('\n'));
+                showSuccess(`${selectedConfigs.length} کانفیگ انتخاب شده با موفقیت کپی شدند`);
+            }
+            
+            // پاک کردن همه کانفیگ‌ها
+            function clearAllConfigs() {
+                if (proxies.length === 0) {
+                    showError('هیچ کانفیگی برای پاک کردن وجود ندارد');
+                    return;
+                }
+                
+                if (confirm('آیا از پاک کردن تمام کانفیگ‌ها مطمئن هستید؟')) {
+                    proxies = [];
+                    updateFilterCounts();
+                    filterProxies(currentFilter);
+                    configTextarea.value = '';
+                    showSuccess('تمامی کانفیگ‌ها پاک شدند');
+                }
+            }
+            
+            // دانلود به عنوان فایل
+            function downloadAsFile(content, filename) {
+                const blob = new Blob([content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
             }
             
             // آیکون مناسب برای هر پروتکل
@@ -849,6 +1187,36 @@
                     case 'shadowsocks': return 'ghost';
                     default: return 'question';
                 }
+            }
+            
+            // غیرفعال/فعال کردن دکمه‌ها
+            function disableButtons(disabled) {
+                const buttons = [
+                    loadBtn, pingAllBtn, parseConfigsBtn, pingConfigsBtn,
+                    exportConfigsBtn, copyAllBtn, exportSelectedBtn, copySelectedBtn, clearAllBtn
+                ];
+                
+                buttons.forEach(btn => {
+                    btn.disabled = disabled;
+                });
+            }
+            
+            // نمایش وضعیت بارگذاری
+            function showLoading(message) {
+                status.textContent = message;
+                status.style.color = '#8395a7';
+            }
+            
+            // نمایش پیام موفقیت
+            function showSuccess(message) {
+                status.textContent = `✅ ${message}`;
+                status.style.color = '#2ecc71';
+            }
+            
+            // نمایش خطا
+            function showError(message) {
+                status.textContent = `❌ ${message}`;
+                status.style.color = '#e74c3c';
             }
         });
     </script>
